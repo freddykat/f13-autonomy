@@ -17,6 +17,22 @@ from validation.flexray_capture_validator import validate_records
 
 FrameKey = tuple[str | None, int | None, int, int]
 
+# Provenance values that do not represent a per-frame timestamp. They can still
+# be useful for ordering/replay, but must never be used to claim timing fidelity.
+NON_FRAME_TIMING_PROVENANCE = {
+    "usb_batch_wall_clock",
+    "batch_wall_clock",
+    "unknown",
+    None,
+}
+
+
+@dataclass(frozen=True)
+class PassiveCaptureQualification:
+    frame_fidelity: str
+    timing_fidelity: str
+    overall: str
+
 
 @dataclass
 class TraceComparison:
@@ -32,6 +48,8 @@ class TraceComparison:
     clock_offset_ns: int | None = None
     max_abs_residual_ns: int | None = None
     median_abs_residual_ns: int | None = None
+    timing_measurement_available: bool = False
+    timing_provenance_notes: list[str] = field(default_factory=list)
 
     @property
     def exact_frame_fidelity(self) -> bool:
@@ -45,29 +63,78 @@ class TraceComparison:
             and self.reference_count == self.candidate_count == self.matched_count
         )
 
+    def classify_frame_fidelity(self) -> str:
+        """Classify frame/payload fidelity independently from timestamp quality."""
+        if self.reference_errors or self.candidate_errors:
+            return "REJECTED"
+        if self.exact_frame_fidelity:
+            return "REPLAY_TRUSTED"
+        return "OBSERVATION_ONLY"
+
+    def classify_timing_fidelity(
+        self,
+        *,
+        replay_residual_limit_ns: int = 10_000_000,
+        state_source_residual_limit_ns: int = 2_000_000,
+    ) -> str:
+        """Classify timing fidelity only when both traces contain per-frame time.
+
+        A batch-level timestamp is deliberately classified TIMING_UNVERIFIED even
+        if the numeric residual happens to look small. Missing measurement must
+        never be converted into apparent precision.
+        """
+        if self.reference_errors or self.candidate_errors:
+            return "REJECTED"
+        if not self.exact_frame_fidelity:
+            return "TIMING_UNVERIFIED"
+        if not self.timing_measurement_available:
+            return "TIMING_UNVERIFIED"
+        if self.max_abs_residual_ns is None:
+            return "TIMING_UNVERIFIED"
+        if self.max_abs_residual_ns <= state_source_residual_limit_ns:
+            return "STATE_SOURCE_CANDIDATE"
+        if self.max_abs_residual_ns <= replay_residual_limit_ns:
+            return "REPLAY_TRUSTED"
+        return "OBSERVATION_ONLY"
+
+    def qualification(
+        self,
+        *,
+        replay_residual_limit_ns: int = 10_000_000,
+        state_source_residual_limit_ns: int = 2_000_000,
+    ) -> PassiveCaptureQualification:
+        frame = self.classify_frame_fidelity()
+        timing = self.classify_timing_fidelity(
+            replay_residual_limit_ns=replay_residual_limit_ns,
+            state_source_residual_limit_ns=state_source_residual_limit_ns,
+        )
+
+        if "REJECTED" in (frame, timing):
+            overall = "REJECTED"
+        elif frame != "REPLAY_TRUSTED":
+            overall = "OBSERVATION_ONLY"
+        elif timing == "STATE_SOURCE_CANDIDATE":
+            overall = "STATE_SOURCE_CANDIDATE"
+        elif timing == "REPLAY_TRUSTED":
+            overall = "REPLAY_TRUSTED"
+        else:
+            # Exact frame/payload replay can be trusted while timestamp fidelity
+            # remains explicitly unverified.
+            overall = "REPLAY_TRUSTED_FRAME_ONLY"
+
+        return PassiveCaptureQualification(frame_fidelity=frame, timing_fidelity=timing, overall=overall)
+
     def classify(
         self,
         *,
         replay_residual_limit_ns: int = 10_000_000,
         state_source_residual_limit_ns: int = 2_000_000,
     ) -> str:
-        """Return a conservative passive-capture qualification.
-
-        Thresholds are engineering defaults, not vehicle-control limits. They
-        are intentionally configurable and should be tightened or replaced by
-        measured requirements before a real interface is promoted.
-        """
-        if self.reference_errors or self.candidate_errors:
-            return "REJECTED"
-        if not self.exact_frame_fidelity:
-            return "OBSERVATION_ONLY"
-        if self.max_abs_residual_ns is None:
-            return "OBSERVATION_ONLY"
-        if self.max_abs_residual_ns <= state_source_residual_limit_ns:
-            return "STATE_SOURCE_CANDIDATE"
-        if self.max_abs_residual_ns <= replay_residual_limit_ns:
-            return "REPLAY_TRUSTED"
-        return "OBSERVATION_ONLY"
+        """Backward-compatible conservative overall qualification."""
+        return self.qualification(
+            replay_residual_limit_ns=replay_residual_limit_ns,
+            state_source_residual_limit_ns=state_source_residual_limit_ns,
+        ).overall
 
 
 def _index(records: list[dict[str, Any]]) -> dict[FrameKey, dict[str, Any]]:
@@ -89,6 +156,20 @@ def _index(records: list[dict[str, Any]]) -> dict[FrameKey, dict[str, Any]]:
     return indexed
 
 
+def _has_per_frame_timing(records: list[dict[str, Any]], label: str, notes: list[str]) -> bool:
+    if not records:
+        notes.append(f"{label}: empty trace")
+        return False
+
+    provenances = {record.get("timing_provenance") for record in records}
+    unusable = provenances & NON_FRAME_TIMING_PROVENANCE
+    if unusable:
+        rendered = ", ".join("<missing>" if value is None else str(value) for value in sorted(unusable, key=str))
+        notes.append(f"{label}: non-per-frame timing provenance: {rendered}")
+        return False
+    return True
+
+
 def compare_traces(
     reference_records: Iterable[dict[str, Any]],
     candidate_records: Iterable[dict[str, Any]],
@@ -96,8 +177,9 @@ def compare_traces(
     """Compare a candidate receive-only trace with a reference trace.
 
     A constant clock offset between independent capture computers is removed
-    using the median matched timestamp delta. Remaining residuals therefore
-    describe relative timing/jitter rather than wall-clock alignment.
+    using the median matched timestamp delta. Remaining residuals describe
+    relative timing/jitter only when both inputs explicitly provide per-frame
+    timestamp provenance.
     """
     reference = list(reference_records)
     candidate = list(candidate_records)
@@ -109,6 +191,11 @@ def compare_traces(
         candidate_count=len(candidate),
         reference_errors=list(reference_validation.errors),
         candidate_errors=list(candidate_validation.errors),
+    )
+
+    result.timing_measurement_available = (
+        _has_per_frame_timing(reference, "reference", result.timing_provenance_notes)
+        and _has_per_frame_timing(candidate, "candidate", result.timing_provenance_notes)
     )
 
     if result.reference_errors or result.candidate_errors:
@@ -134,7 +221,8 @@ def compare_traces(
         if ref["payload_hex"].lower() != cand["payload_hex"].lower():
             result.payload_mismatches.append(key)
 
-        time_deltas.append(cand["host_time_ns"] - ref["host_time_ns"])
+        if result.timing_measurement_available:
+            time_deltas.append(cand["host_time_ns"] - ref["host_time_ns"])
 
     if time_deltas:
         offset = int(median(time_deltas))
