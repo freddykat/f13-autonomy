@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "episodes": [
+    {
+      "episode_id": "straight_agreement",
+      "expected": {
+        "yaw_rate": "AGREE",
+        "vehicle_speed": "AGREE",
+        "lateral_acceleration": "AGREE"
+      },
+      "observations": [
+        {"signal":"yaw_rate","source":"flexray","value":0.20,"unit":"deg/s","sample_time_ns":1000000000,"receive_time_ns":1030000000},
+        {"signal":"yaw_rate","source":"imu","value":0.35,"unit":"deg/s","sample_time_ns":1001000000,"receive_time_ns":1030000000},
+        {"signal":"vehicle_speed","source":"can","value":22.10,"unit":"m/s","sample_time_ns":1000000000,"receive_time_ns":1040000000},
+        {"signal":"vehicle_speed","source":"gnss","value":22.35,"unit":"m/s","sample_time_ns":1000000000,"receive_time_ns":1040000000},
+        {"signal":"lateral_acceleration","source":"icm","value":0.05,"unit":"m/s^2","sample_time_ns":1000000000,"receive_time_ns":1030000000},
+        {"signal":"lateral_acceleration","source":"imu","value":0.12,"unit":"m/s^2","sample_time_ns":1001000000,"receive_time_ns":1030000000}
+      ]
+    },
+    {
+      "episode_id": "yaw_disagreement_is_visible",
+      "expected": {"yaw_rate": "DISAGREE"},
+      "observations": [
+        {"signal":"yaw_rate","source":"flexray","value":8.0,"unit":"deg/s","sample_time_ns":2000000000,"receive_time_ns":2040000000},
+        {"signal":"yaw_rate","source":"imu","value":10.2,"unit":"deg/s","sample_time_ns":2001000000,"receive_time_ns":2040000000}
+      ]
+    },
+    {
+      "episode_id": "batch_timestamp_cannot_corroborate",
+      "expected": {"yaw_rate": "SINGLE_SOURCE"},
+      "observations": [
+        {"signal":"yaw_rate","source":"pico_flexray","value":4.1,"unit":"deg/s","sample_time_ns":3000000000,"receive_time_ns":3030000000,"timing_provenance":"usb_batch_wall_clock"},
+        {"signal":"yaw_rate","source":"imu","value":4.0,"unit":"deg/s","sample_time_ns":3001000000,"receive_time_ns":3030000000,"timing_provenance":"per_sample_monotonic"}
+      ]
+    },
+    {
+      "episode_id": "unknown_is_not_zero",
+      "expected": {"lateral_acceleration": "SINGLE_SOURCE"},
+      "observations": [
+        {"signal":"lateral_acceleration","source":"icm","value":null,"unit":"m/s^2","sample_time_ns":4000000000,"receive_time_ns":4030000000,"validity":"UNKNOWN"},
+        {"signal":"lateral_acceleration","source":"imu","value":1.1,"unit":"m/s^2","sample_time_ns":4001000000,"receive_time_ns":4030000000}
+      ]
+    }
+  ]
+}
