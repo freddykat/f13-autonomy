@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "manifest_id": "prototype-001-bmw-observation-decoders",
+  "mode": "read_only_decoder_manifest",
+  "vehicle_profiles": {
+    "prototype-001-f13-650i-xdrive-2012": {
+      "make": "BMW",
+      "chassis": "F13",
+      "model": "650i xDrive",
+      "model_year": 2012,
+      "powertrain": "N63 non-TU",
+      "notes": "ECU part numbers and software versions must be captured before a decoder is scoped more narrowly."
+    }
+  },
+  "signals": []
+}
