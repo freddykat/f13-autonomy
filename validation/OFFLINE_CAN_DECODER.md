@@ -1,0 +1,120 @@
+# Offline manifest-driven CAN decoder
+
+`validation/offline_can_decoder.py` is the execution boundary between canonical raw CAN capture documents and normalized decoded observations.
+
+It is intentionally offline-only. It opens JSON files from disk and contains no SocketCAN, Panda, ENET, FlexRay, EPS, DSC, steering, brake or torque interface.
+
+## Pipeline
+
+```text
+candump / Vector ASC
+        |
+        v
+validation/can_trace_import.py
+        |
+        v
+canonical raw CAN capture
+        |
+        v
+validation/bmw_decoder_manifest.py
+        |
+        v
+validation/offline_can_decoder.py
+        |
+        v
+decoded observation document
+        |
+        v
+observation episode importer / cross-source validation
+        |
+        v
+BMWVehicleState review candidate
+```
+
+The committed Prototype 001 manifest currently contains zero BMW signal entries, so running the decoder with that manifest produces zero observations. Synthetic tests use explicitly labelled fixture IDs only.
+
+## Which manifest entries execute
+
+The decoder ignores mappings in these states:
+
+- `UNVERIFIED`
+- `FRAME_OBSERVED`
+- `REJECTED`
+
+Only these statuses may produce an observation:
+
+- `SEMANTIC_CANDIDATE`
+- `CROSS_SOURCE_VALIDATED`
+- `STATE_SOURCE_CANDIDATE`
+
+This does not make them authoritative. The output preserves `decoder_status`, `decoder_version`, vehicle profile and capture provenance so downstream gates can distinguish a semantic hypothesis from a state-source candidate.
+
+## Provenance preservation
+
+Every emitted observation carries the source capture's:
+
+- `capture_id`
+- `clock_domain`
+- per-frame timestamp and `timestamp_provenance`
+- adapter name
+- declared `listen_only` state, including `null` when unknown
+- source format and channel
+
+The decoder does not improve, interpolate or reinterpret capture timing. A host timestamp remains a host/capture-tool timestamp; unknown listen-only state remains unknown.
+
+This is important because a correct signal mapping cannot repair a lossy recorder.
+
+## Validity semantics
+
+A matched frame produces one of:
+
+- `VALID` — value decoded and within any declared physical range
+- `INVALID_RAW` — raw value is explicitly reserved/invalid in the manifest
+- `OUT_OF_RANGE` — decoded numeric value violates the declared physical range
+
+`INVALID_RAW` and `OUT_OF_RANGE` both emit `value = null`. They never silently become zero.
+
+## Deliberately narrow bit-layout support
+
+The manifest schema can describe more layouts than this first executor is willing to interpret.
+
+The executor currently handles:
+
+- byte-aligned, byte-multiple fields using explicit little/big byte order when bit numbering is `lsb0`;
+- single-byte bitfields with explicit `lsb0` or `msb0` numbering.
+
+It deliberately rejects non-byte-aligned multi-byte fields. Intel/Motorola conventions for those fields are easy to transcribe incorrectly and must be added only with representative raw fixtures that pin the intended semantics.
+
+Failing closed is preferable to producing a plausible but wrong steering, yaw, speed or acceleration value.
+
+## Frame matching
+
+A decoder entry matches a frame only when all declared selector properties agree:
+
+- receive direction
+- capture channel
+- arbitration ID
+- standard/extended form
+- DLC
+
+Unmatched frames remain raw evidence and produce no observation.
+
+## Safety boundary
+
+Every output document and every emitted observation declares:
+
+`actuation_authority = NONE`
+
+`STATE_SOURCE_CANDIDATE` means eligible for observation review only. This module cannot transmit a CAN or FlexRay frame and cannot command EPS or DSC.
+
+## Usage
+
+```bash
+python -m validation.offline_can_decoder \
+  capture.json \
+  validation/manifests/prototype_001_bmw_decoders.json \
+  --vehicle-profile prototype-001-f13-650i-xdrive-2012 \
+  --output observations.json
+```
+
+With the current production manifest, the expected result is `observation_count = 0`.
