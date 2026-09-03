@@ -1,0 +1,52 @@
+{
+  "adapter": "SYNTHETIC_REFERENCE",
+  "capture_id": "beta0-reference-001",
+  "capture_quality": "FULL_RATE_CANDIDATE",
+  "clock_domain": "reference-clock",
+  "filter_mode": "SINGLE_ID_HARDWARE",
+  "frame_count": 3,
+  "frames": [
+    {
+      "arbitration_id": 291,
+      "channel": "asc:1",
+      "data_hex": "01020304",
+      "direction": "Rx",
+      "dlc": 4,
+      "is_extended_id": false,
+      "is_remote_frame": false,
+      "source_format": "synthetic_vector_asc",
+      "timestamp_ns": 1000000000,
+      "timestamp_provenance": "reference_export"
+    },
+    {
+      "arbitration_id": 291,
+      "channel": "asc:1",
+      "data_hex": "11020304",
+      "direction": "Rx",
+      "dlc": 4,
+      "is_extended_id": false,
+      "is_remote_frame": false,
+      "source_format": "synthetic_vector_asc",
+      "timestamp_ns": 1100000000,
+      "timestamp_provenance": "reference_export"
+    },
+    {
+      "arbitration_id": 291,
+      "channel": "asc:1",
+      "data_hex": "21020304",
+      "direction": "Rx",
+      "dlc": 4,
+      "is_extended_id": false,
+      "is_remote_frame": false,
+      "source_format": "synthetic_vector_asc",
+      "timestamp_ns": 1200000000,
+      "timestamp_provenance": "reference_export"
+    }
+  ],
+  "listen_only": true,
+  "mode": "read_only_can_capture_import",
+  "rx_dropped_count": 0,
+  "rx_overflow_count": 0,
+  "rx_queue_depth": 64,
+  "schema_version": 2
+}

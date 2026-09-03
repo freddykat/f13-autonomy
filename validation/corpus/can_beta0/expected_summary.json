@@ -1,0 +1,9 @@
+{
+  "actuation_authority": "NONE",
+  "beta_stage": "BETA_0_OFFLINE_REPLAY",
+  "capture_quality": "FULL_RATE_CANDIDATE",
+  "frame_fidelity": "EXACT",
+  "observation_count": 0,
+  "timing_fidelity": "PER_FRAME_COMPARABLE",
+  "verdict": "READY_FOR_REPLAY_REVIEW"
+}

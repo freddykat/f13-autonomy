@@ -1,0 +1,16 @@
+{
+  "candidate_channel_map": {
+    "can0": "fixture-vehicle-can"
+  },
+  "logical_bus": "fixture-vehicle-can",
+  "pair_id": "beta0-pair-001",
+  "physical_tap": "synthetic passive fixture",
+  "reference_channel_map": {
+    "asc:1": "fixture-vehicle-can"
+  },
+  "reference_quality_evidence": null,
+  "same_physical_interval": true,
+  "session_id": "beta0-session-001",
+  "sync_evidence": "synthetic shared transition marker at first frame",
+  "sync_method": "OBSERVED_MARKER"
+}
