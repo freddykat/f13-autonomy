@@ -2,6 +2,7 @@ import copy
 
 import pytest
 
+from validation.can_trace_compare import compare_can_captures
 from validation.offline_can_decoder import OfflineDecodeError, decode_capture
 
 
@@ -154,6 +155,29 @@ def test_declared_full_rate_without_loss_evidence_is_downgraded_before_decode():
     assert observation["capture_quality"] == "OBSERVATION_ONLY"
     assert observation["observation_confidence"] == "OBSERVATION_ONLY"
     assert result["capture_quality_evaluation"]["actuation_authority"] == "NONE"
+
+
+def test_exact_comparison_qualifies_capture_through_decoder_boundary():
+    reference = capture()
+    reference["capture_id"] = "qualified-reference"
+    candidate_capture = capture(quality="OBSERVATION_ONLY")
+    candidate_capture["filter_mode"] = "UNKNOWN"
+    candidate_capture["rx_queue_depth"] = None
+    candidate_capture["rx_dropped_count"] = None
+    candidate_capture["rx_overflow_count"] = None
+    comparison = compare_can_captures(
+        reference, candidate_capture, simultaneous=True
+    )
+
+    result = decode_capture(
+        candidate_capture,
+        manifest(signal()),
+        vehicle_profile=PROFILE,
+        reference_comparison=comparison,
+    )
+    assert result["capture_quality"] == "FULL_RATE_CANDIDATE"
+    assert result["observations"][0]["observation_confidence"] == "DECODE_REVIEW_CANDIDATE"
+    assert result["actuation_authority"] == "NONE"
 
 
 def test_full_rate_candidate_rejects_observed_overflow():

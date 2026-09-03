@@ -50,7 +50,7 @@ Negative evidence takes precedence over every positive claim.
 
 The trace must be non-empty, structurally valid and explicitly listen-only. In addition, at least one of these evidence paths must be present:
 
-- exact frame fidelity against a simultaneous reference capture;
+- exact frame fidelity calculated by the simultaneous CAN comparator (or the existing FlexRay comparison path);
 - independently confirmed expected message/frame rate;
 - continuous adapter-side monotonic sequence;
 - schedule-validated cycle statistics without anomalies;
@@ -101,4 +101,4 @@ Therefore a capture labelled `FULL_RATE_CANDIDATE` with unknown drop/overflow ev
 python -m validation.capture_quality_evaluator capture.json
 ```
 
-Optional supplemental evidence can be supplied with `--evidence evidence.json`. The supplemental object may contain sequence/cycle provenance and statistics, expected-rate validation and reference-frame fidelity.
+Optional supplemental evidence can be supplied with `--evidence evidence.json`. The supplemental object may contain sequence/cycle provenance and statistics or expected-rate validation. For CAN, reference-frame fidelity is never accepted as a manual field; it must come from `validation/can_trace_compare.py` and be passed as a typed comparison report by the offline pipeline.

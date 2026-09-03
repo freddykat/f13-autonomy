@@ -107,6 +107,30 @@ def _normalize_supplemental(raw: dict[str, Any] | None) -> dict[str, Any]:
     return normalized
 
 
+def _apply_can_reference_comparison(
+    supplemental: dict[str, Any],
+    comparison: Any,
+    capture_id: str,
+) -> None:
+    if comparison is None:
+        return
+    from validation.can_trace_compare import CanTraceComparisonReport
+
+    if not isinstance(comparison, CanTraceComparisonReport):
+        raise CaptureQualityError("reference_comparison must be a CAN comparison report")
+    try:
+        comparison.validate()
+    except ValueError as exc:
+        raise CaptureQualityError(f"invalid CAN reference comparison: {exc}") from exc
+    if comparison.candidate_capture_id != capture_id:
+        raise CaptureQualityError("reference comparison candidate_capture_id does not match capture")
+    if supplemental["reference_frame_fidelity"] != "NOT_COMPARED":
+        raise CaptureQualityError("CAN reference fidelity cannot be supplied both manually and by comparison")
+    if comparison.frame_fidelity == "EXACT" and not comparison.qualifies_candidate(capture_id):
+        raise CaptureQualityError("CAN EXACT comparison does not satisfy qualification invariants")
+    supplemental["reference_frame_fidelity"] = comparison.frame_fidelity
+
+
 def _timing_quality(record_count: int, provenances: set[Any], regressions: int) -> str:
     if regressions:
         return "INVALID"
@@ -343,6 +367,7 @@ def evaluate_can_capture(
     capture: dict[str, Any],
     *,
     supplemental_evidence: dict[str, Any] | None = None,
+    reference_comparison: Any = None,
 ) -> CaptureQualityReport:
     if not isinstance(capture, dict):
         raise CaptureQualityError("CAN capture must be an object")
@@ -354,7 +379,14 @@ def evaluate_can_capture(
     record_count, structural_errors, timestamp_regressions, provenances = _scan_can_frames(
         capture.get("frames"), capture.get("frame_count")
     )
+    if supplemental_evidence and "reference_frame_fidelity" in supplemental_evidence:
+        raise CaptureQualityError(
+            "CAN reference_frame_fidelity must come from can_trace_compare, not manual evidence"
+        )
     supplemental = _normalize_supplemental(supplemental_evidence)
+    _apply_can_reference_comparison(
+        supplemental, reference_comparison, capture.get("capture_id")
+    )
     return _evaluate(
         capture_id=capture.get("capture_id"),
         transport="CAN",

@@ -127,14 +127,6 @@ def test_observed_drop_forces_lossy_even_when_declared_full_rate():
     assert any("3 dropped" in reason for reason in report.negative_evidence)
 
 
-def test_exact_simultaneous_reference_can_qualify_vector_style_capture():
-    report = evaluate_can_capture(
-        can_capture(dropped=None, overflow=None),
-        supplemental_evidence={"reference_frame_fidelity": "EXACT"},
-    )
-    assert report.evaluated_quality == "FULL_RATE_CANDIDATE"
-
-
 def test_failed_expected_rate_check_forces_lossy():
     report = evaluate_can_capture(
         can_capture(filter_mode="SINGLE_ID_HARDWARE", dropped=0, overflow=0),
@@ -225,14 +217,6 @@ def test_declared_observation_only_is_a_ceiling_without_exact_reference():
     )
     report = evaluate_can_capture(capture)
     assert report.evaluated_quality == "OBSERVATION_ONLY"
-
-
-def test_reference_mismatch_forces_lossy():
-    report = evaluate_can_capture(
-        can_capture(),
-        supplemental_evidence={"reference_frame_fidelity": "MISMATCH"},
-    )
-    assert report.evaluated_quality == "LOSSY"
 
 
 def test_sequence_gap_is_negative_even_when_sequence_origin_is_unknown():

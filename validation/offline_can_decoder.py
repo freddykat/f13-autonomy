@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from validation.bmw_decoder_manifest import validate_manifest
+from validation.can_trace_compare import CanTraceComparisonReport
 from validation.capture_quality_evaluator import evaluate_can_capture
 
 
@@ -162,9 +163,12 @@ def decode_capture(
     manifest: dict[str, Any],
     *,
     vehicle_profile: str,
+    reference_comparison: CanTraceComparisonReport | None = None,
 ) -> dict[str, Any]:
     _validate_capture(capture)
-    quality_report = evaluate_can_capture(capture)
+    quality_report = evaluate_can_capture(
+        capture, reference_comparison=reference_comparison
+    )
     evaluated_capture_quality = quality_report.evaluated_quality
     manifest_report = validate_manifest(manifest)
     profiles = manifest["vehicle_profiles"]
@@ -245,12 +249,25 @@ def main() -> None:
     parser.add_argument("capture", type=Path)
     parser.add_argument("manifest", type=Path)
     parser.add_argument("--vehicle-profile", required=True)
+    parser.add_argument("--reference-comparison", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
     capture = json.loads(args.capture.read_text(encoding="utf-8"))
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    result = decode_capture(capture, manifest, vehicle_profile=args.vehicle_profile)
+    comparison = (
+        None
+        if args.reference_comparison is None
+        else CanTraceComparisonReport.from_dict(
+            json.loads(args.reference_comparison.read_text(encoding="utf-8"))
+        )
+    )
+    result = decode_capture(
+        capture,
+        manifest,
+        vehicle_profile=args.vehicle_profile,
+        reference_comparison=comparison,
+    )
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
