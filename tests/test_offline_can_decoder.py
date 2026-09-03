@@ -86,14 +86,19 @@ def manifest(sig=None):
     }
 
 
-def capture(data_hex="0034120000000000", channel="can0"):
+def capture(data_hex="0034120000000000", channel="can0", quality="FULL_RATE_CANDIDATE"):
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "capture_id": "fixture-capture",
         "mode": "read_only_can_capture_import",
         "clock_domain": "fixture_clock",
         "adapter": "fixture_adapter",
         "listen_only": True,
+        "capture_quality": quality,
+        "filter_mode": "SINGLE_ID_HARDWARE",
+        "rx_queue_depth": 64,
+        "rx_dropped_count": 0,
+        "rx_overflow_count": 0,
         "frame_count": 1,
         "frames": [
             {
@@ -126,7 +131,24 @@ def test_semantic_candidate_decodes_offline_and_preserves_provenance():
     assert observation["capture_id"] == "fixture-capture"
     assert observation["timing_provenance"] == "capture_tool_timestamp"
     assert observation["decoder_status"] == "SEMANTIC_CANDIDATE"
+    assert observation["capture_quality"] == "FULL_RATE_CANDIDATE"
+    assert observation["observation_confidence"] == "DECODE_REVIEW_CANDIDATE"
     assert observation["actuation_authority"] == "NONE"
+
+
+def test_lossy_capture_can_be_inspected_but_is_never_promoted():
+    result = decode_capture(capture(quality="LOSSY"), manifest(signal()), vehicle_profile=PROFILE)
+    observation = result["observations"][0]
+    assert observation["value"] == pytest.approx(466.0)
+    assert observation["observation_confidence"] == "LOSSY_CAPTURE_ONLY"
+    assert observation["actuation_authority"] == "NONE"
+
+
+def test_full_rate_candidate_rejects_observed_overflow():
+    candidate_capture = capture()
+    candidate_capture["rx_overflow_count"] = 1
+    with pytest.raises(OfflineDecodeError, match="drops or overflows"):
+        decode_capture(candidate_capture, manifest(), vehicle_profile=PROFILE)
 
 
 def test_unverified_decoder_is_not_executable():
@@ -136,11 +158,7 @@ def test_unverified_decoder_is_not_executable():
 
 
 def test_invalid_raw_becomes_none_and_never_zero():
-    result = decode_capture(
-        capture("00FFFF0000000000"),
-        manifest(signal()),
-        vehicle_profile=PROFILE,
-    )
+    result = decode_capture(capture("00FFFF0000000000"), manifest(signal()), vehicle_profile=PROFILE)
     observation = result["observations"][0]
     assert observation["validity"] == "INVALID_RAW"
     assert observation["value"] is None
@@ -162,14 +180,7 @@ def test_channel_mismatch_does_not_decode():
 
 def test_non_byte_aligned_multibyte_layout_fails_closed():
     candidate = signal()
-    candidate["layout"].update(
-        {
-            "start_byte": 1,
-            "start_bit_in_byte": 1,
-            "absolute_start_bit": 9,
-            "bit_length": 12,
-        }
-    )
+    candidate["layout"].update({"start_byte": 1, "start_bit_in_byte": 1, "absolute_start_bit": 9, "bit_length": 12})
     with pytest.raises(OfflineDecodeError, match="fixture-backed semantics"):
         decode_capture(capture(), manifest(candidate), vehicle_profile=PROFILE)
 
@@ -200,8 +211,9 @@ def test_state_source_candidate_still_has_no_actuation_authority():
         evidence("cross_source_report", "report-a", "validation_report"),
     ]
     result = decode_capture(capture(), manifest(candidate), vehicle_profile=PROFILE)
-    assert result["observation_count"] == 1
-    assert result["observations"][0]["actuation_authority"] == "NONE"
+    observation = result["observations"][0]
+    assert observation["observation_confidence"] == "STATE_SOURCE_REVIEW_CANDIDATE"
+    assert observation["actuation_authority"] == "NONE"
     assert result["actuation_authority"] == "NONE"
 
 
