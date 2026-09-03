@@ -144,6 +144,18 @@ def test_lossy_capture_can_be_inspected_but_is_never_promoted():
     assert observation["actuation_authority"] == "NONE"
 
 
+def test_declared_full_rate_without_loss_evidence_is_downgraded_before_decode():
+    candidate_capture = capture()
+    candidate_capture["rx_dropped_count"] = None
+    candidate_capture["rx_overflow_count"] = None
+    result = decode_capture(candidate_capture, manifest(signal()), vehicle_profile=PROFILE)
+    observation = result["observations"][0]
+    assert observation["declared_capture_quality"] == "FULL_RATE_CANDIDATE"
+    assert observation["capture_quality"] == "OBSERVATION_ONLY"
+    assert observation["observation_confidence"] == "OBSERVATION_ONLY"
+    assert result["capture_quality_evaluation"]["actuation_authority"] == "NONE"
+
+
 def test_full_rate_candidate_rejects_observed_overflow():
     candidate_capture = capture()
     candidate_capture["rx_overflow_count"] = 1
@@ -181,6 +193,7 @@ def test_channel_mismatch_does_not_decode():
 def test_non_byte_aligned_multibyte_layout_fails_closed():
     candidate = signal()
     candidate["layout"].update({"start_byte": 1, "start_bit_in_byte": 1, "absolute_start_bit": 9, "bit_length": 12})
+    candidate["validity"]["invalid_raw_values"] = [4095]
     with pytest.raises(OfflineDecodeError, match="fixture-backed semantics"):
         decode_capture(capture(), manifest(candidate), vehicle_profile=PROFILE)
 

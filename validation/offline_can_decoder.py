@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from validation.bmw_decoder_manifest import validate_manifest
+from validation.capture_quality_evaluator import evaluate_can_capture
 
 
 EXECUTABLE_STATUSES = {
@@ -163,6 +164,8 @@ def decode_capture(
     vehicle_profile: str,
 ) -> dict[str, Any]:
     _validate_capture(capture)
+    quality_report = evaluate_can_capture(capture)
+    evaluated_capture_quality = quality_report.evaluated_quality
     manifest_report = validate_manifest(manifest)
     profiles = manifest["vehicle_profiles"]
     if vehicle_profile not in profiles:
@@ -193,7 +196,8 @@ def decode_capture(
                     "timing_provenance": frame["timestamp_provenance"],
                     "adapter": capture["adapter"],
                     "listen_only": capture["listen_only"],
-                    "capture_quality": capture["capture_quality"],
+                    "declared_capture_quality": capture["capture_quality"],
+                    "capture_quality": evaluated_capture_quality,
                     "filter_mode": capture["filter_mode"],
                     "rx_queue_depth": capture["rx_queue_depth"],
                     "rx_dropped_count": capture["rx_dropped_count"],
@@ -204,7 +208,7 @@ def decode_capture(
                     "decoder_version": signal["decoder_version"],
                     "decoder_status": signal["validation_status"],
                     "observation_confidence": _observation_confidence(
-                        capture["capture_quality"], signal["validation_status"]
+                        evaluated_capture_quality, signal["validation_status"]
                     ),
                     "signal": signal["signal"],
                     "state_path": signal["state_path"],
@@ -221,7 +225,9 @@ def decode_capture(
         "schema_version": 2,
         "mode": "offline_manifest_can_decode",
         "capture_id": capture["capture_id"],
-        "capture_quality": capture["capture_quality"],
+        "declared_capture_quality": capture["capture_quality"],
+        "capture_quality": evaluated_capture_quality,
+        "capture_quality_evaluation": quality_report.to_dict(),
         "vehicle_profile": vehicle_profile,
         "manifest_id": manifest_report["manifest_id"],
         "manifest_signal_count": manifest_report["signal_count"],

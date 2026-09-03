@@ -64,6 +64,8 @@ The decoder does not improve, interpolate or reinterpret capture timing. A host 
 
 This is important because a correct signal mapping cannot repair a lossy recorder.
 
+Before decoding, `validation/capture_quality_evaluator.py` derives capture quality from recorder counters and observable statistics. Both `declared_capture_quality` and the evaluated `capture_quality` are preserved, while observation confidence uses only the evaluated result. A declaration cannot promote itself past missing or contradictory acquisition evidence.
+
 ## Validity semantics
 
 A matched frame produces one of:

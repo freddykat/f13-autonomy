@@ -48,6 +48,8 @@ Allowed filter provenance is `UNKNOWN`, `ACCEPT_ALL`, `SINGLE_ID_HARDWARE`, `MUL
 
 A `FULL_RATE_CANDIDATE` cannot simultaneously report a non-zero drop or overflow counter. Missing counters remain `null`; `null` never means zero.
 
+The source declaration is not the final classification. `validation/capture_quality_evaluator.py` re-evaluates the capture from these fields and observable trace statistics. A self-declared `FULL_RATE_CANDIDATE` with unknown loss counters is downgraded to `OBSERVATION_ONLY` unless independent completeness evidence is supplied.
+
 This distinction is motivated by real automotive logger behavior: a decoder may be correct while an undersized receive queue silently drops frames and falsifies apparent message cadence. Capture quality is therefore independent of decoder confidence.
 
 ## Timing semantics
