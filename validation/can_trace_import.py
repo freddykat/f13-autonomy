@@ -23,6 +23,9 @@ ASC_RE = re.compile(
     r"(?P<data>(?:\s+[0-9A-Fa-f]{2})*)\s*$"
 )
 
+CAPTURE_QUALITIES = {"UNKNOWN", "LOSSY", "OBSERVATION_ONLY", "FULL_RATE_CANDIDATE"}
+FILTER_MODES = {"UNKNOWN", "ACCEPT_ALL", "SINGLE_ID_HARDWARE", "MULTI_ID_HARDWARE", "SOFTWARE"}
+
 
 @dataclass(frozen=True)
 class CanonicalCanFrame:
@@ -136,14 +139,38 @@ def build_capture_document(
     clock_domain: str,
     adapter: str,
     listen_only: bool | None,
+    capture_quality: str = "UNKNOWN",
+    filter_mode: str = "UNKNOWN",
+    rx_queue_depth: int | None = None,
+    rx_dropped_count: int | None = None,
+    rx_overflow_count: int | None = None,
 ) -> dict:
+    if capture_quality not in CAPTURE_QUALITIES:
+        raise ValueError(f"unsupported capture_quality: {capture_quality}")
+    if filter_mode not in FILTER_MODES:
+        raise ValueError(f"unsupported filter_mode: {filter_mode}")
+    for name, value in (
+        ("rx_queue_depth", rx_queue_depth),
+        ("rx_dropped_count", rx_dropped_count),
+        ("rx_overflow_count", rx_overflow_count),
+    ):
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 0):
+            raise ValueError(f"{name} must be a non-negative integer or null")
+    if capture_quality == "FULL_RATE_CANDIDATE" and (rx_dropped_count not in (0, None) or rx_overflow_count not in (0, None)):
+        raise ValueError("FULL_RATE_CANDIDATE cannot declare observed drops or overflows")
+
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "capture_id": capture_id,
         "mode": "read_only_can_capture_import",
         "clock_domain": clock_domain,
         "adapter": adapter,
         "listen_only": listen_only,
+        "capture_quality": capture_quality,
+        "filter_mode": filter_mode,
+        "rx_queue_depth": rx_queue_depth,
+        "rx_dropped_count": rx_dropped_count,
+        "rx_overflow_count": rx_overflow_count,
         "frame_count": len(frames),
         "frames": [asdict(frame) for frame in frames],
     }
@@ -159,6 +186,11 @@ def main() -> None:
     parser.add_argument("--clock-domain", default="capture_tool_clock")
     parser.add_argument("--adapter", default="UNSPECIFIED")
     parser.add_argument("--listen-only", choices=("true", "false", "unknown"), default="unknown")
+    parser.add_argument("--capture-quality", choices=tuple(sorted(CAPTURE_QUALITIES)), default="UNKNOWN")
+    parser.add_argument("--filter-mode", choices=tuple(sorted(FILTER_MODES)), default="UNKNOWN")
+    parser.add_argument("--rx-queue-depth", type=int)
+    parser.add_argument("--rx-dropped-count", type=int)
+    parser.add_argument("--rx-overflow-count", type=int)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -170,6 +202,11 @@ def main() -> None:
         clock_domain=args.clock_domain,
         adapter=args.adapter,
         listen_only=listen_only,
+        capture_quality=args.capture_quality,
+        filter_mode=args.filter_mode,
+        rx_queue_depth=args.rx_queue_depth,
+        rx_dropped_count=args.rx_dropped_count,
+        rx_overflow_count=args.rx_overflow_count,
     )
     args.output.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
