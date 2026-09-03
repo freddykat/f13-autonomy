@@ -13,6 +13,7 @@ EXECUTABLE_STATUSES = {
     "CROSS_SOURCE_VALIDATED",
     "STATE_SOURCE_CANDIDATE",
 }
+CAPTURE_QUALITIES = {"UNKNOWN", "LOSSY", "OBSERVATION_ONLY", "FULL_RATE_CANDIDATE"}
 
 
 class OfflineDecodeError(ValueError):
@@ -26,7 +27,8 @@ def _fail(message: str) -> None:
 def _validate_capture(capture: dict[str, Any]) -> None:
     required = {
         "schema_version", "capture_id", "mode", "clock_domain", "adapter",
-        "listen_only", "frame_count", "frames",
+        "listen_only", "capture_quality", "filter_mode", "rx_queue_depth",
+        "rx_dropped_count", "rx_overflow_count", "frame_count", "frames",
     }
     if not isinstance(capture, dict):
         _fail("capture must be an object")
@@ -36,8 +38,8 @@ def _validate_capture(capture: dict[str, Any]) -> None:
         _fail(f"capture missing required fields: {', '.join(missing)}")
     if unknown:
         _fail(f"capture contains unknown fields: {', '.join(unknown)}")
-    if capture["schema_version"] != 1:
-        _fail("capture schema_version must equal 1")
+    if capture["schema_version"] != 2:
+        _fail("capture schema_version must equal 2")
     if capture["mode"] != "read_only_can_capture_import":
         _fail("capture mode must be 'read_only_can_capture_import'")
     if not isinstance(capture["frames"], list):
@@ -46,6 +48,15 @@ def _validate_capture(capture: dict[str, Any]) -> None:
         _fail("capture.frame_count does not match frames length")
     if capture["listen_only"] not in (True, False, None):
         _fail("capture.listen_only must be true, false or null")
+    if capture["capture_quality"] not in CAPTURE_QUALITIES:
+        _fail("capture.capture_quality is unsupported")
+    for name in ("rx_queue_depth", "rx_dropped_count", "rx_overflow_count"):
+        value = capture[name]
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 0):
+            _fail(f"capture.{name} must be a non-negative integer or null")
+    if capture["capture_quality"] == "FULL_RATE_CANDIDATE":
+        if capture["rx_dropped_count"] not in (0, None) or capture["rx_overflow_count"] not in (0, None):
+            _fail("FULL_RATE_CANDIDATE capture cannot report observed drops or overflows")
 
 
 def _payload(frame: dict[str, Any]) -> bytes:
@@ -135,6 +146,16 @@ def _decode_value(raw: int, signal: dict[str, Any]) -> tuple[Any, str]:
     return value, "VALID"
 
 
+def _observation_confidence(capture_quality: str, decoder_status: str) -> str:
+    if capture_quality == "LOSSY":
+        return "LOSSY_CAPTURE_ONLY"
+    if capture_quality in {"UNKNOWN", "OBSERVATION_ONLY"}:
+        return "OBSERVATION_ONLY"
+    if decoder_status == "STATE_SOURCE_CANDIDATE":
+        return "STATE_SOURCE_REVIEW_CANDIDATE"
+    return "DECODE_REVIEW_CANDIDATE"
+
+
 def decode_capture(
     capture: dict[str, Any],
     manifest: dict[str, Any],
@@ -172,11 +193,19 @@ def decode_capture(
                     "timing_provenance": frame["timestamp_provenance"],
                     "adapter": capture["adapter"],
                     "listen_only": capture["listen_only"],
+                    "capture_quality": capture["capture_quality"],
+                    "filter_mode": capture["filter_mode"],
+                    "rx_queue_depth": capture["rx_queue_depth"],
+                    "rx_dropped_count": capture["rx_dropped_count"],
+                    "rx_overflow_count": capture["rx_overflow_count"],
                     "source_format": frame["source_format"],
                     "source_channel": frame["channel"],
                     "decoder_id": signal["decoder_id"],
                     "decoder_version": signal["decoder_version"],
                     "decoder_status": signal["validation_status"],
+                    "observation_confidence": _observation_confidence(
+                        capture["capture_quality"], signal["validation_status"]
+                    ),
                     "signal": signal["signal"],
                     "state_path": signal["state_path"],
                     "raw_value": raw,
@@ -189,9 +218,10 @@ def decode_capture(
             )
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "mode": "offline_manifest_can_decode",
         "capture_id": capture["capture_id"],
+        "capture_quality": capture["capture_quality"],
         "vehicle_profile": vehicle_profile,
         "manifest_id": manifest_report["manifest_id"],
         "manifest_signal_count": manifest_report["signal_count"],
