@@ -1,6 +1,6 @@
 # Simultaneous CAN trace comparison
 
-`validation/can_trace_compare.py` compares two canonical CAN schema-v2 captures of the same physical bus interval. The intended use is a candidate adapter such as Panda or pico hardware captured simultaneously with a qualified reference such as Vector/CANoe.
+`validation/can_trace_compare.py` compares two canonical CAN schema-v2 captures bound by `validation/capture_pair_manifest.py` to the same physical bus session. The intended use is a candidate adapter such as Panda or pico hardware captured simultaneously with a qualified reference such as Vector/CANoe.
 
 The comparator is offline and receive-only. It has no SocketCAN, Panda, diagnostic, EPS, DSC, steering, braking, torque or transmit interface, and it does not contain BMW signal IDs or decoding assumptions.
 
@@ -20,8 +20,9 @@ Channel names are never guessed. If the tools call the same physical bus `can0` 
 
 ## Frame-fidelity results
 
-- `EXACT`: both captures contain the same non-empty receive-frame sequence and payloads, the run is declared simultaneous, and the reference independently evaluates as `FULL_RATE_CANDIDATE`;
+- `EXACT`: both captures contain the same non-empty receive-frame sequence and payloads, the capture-pair synchronization is verified, and the reference independently evaluates as `FULL_RATE_CANDIDATE`;
 - `MISMATCH`: missing, extra or byte-divergent frames exist against a qualified simultaneous reference;
+- `UNVERIFIED_PAIR`: the documents are hash-bound but their synchronization is only a manual assertion;
 - `UNQUALIFIED_REFERENCE`: the frames match, but completeness of the reference itself is not established;
 - `NOT_SIMULTANEOUS`: the captures were not declared as the same physical interval;
 - `INVALID`: the comparison cannot establish a usable non-empty stream.
@@ -32,7 +33,7 @@ The report includes missing, extra and payload-mismatch counts plus bounded exam
 
 For CAN, `capture_quality_evaluator.py` now rejects a manually supplied `reference_frame_fidelity`. It accepts only a `CanTraceComparisonReport` whose `candidate_capture_id` matches the capture being evaluated.
 
-Therefore an `EXACT` result cannot be introduced through the generic evidence JSON. It must be calculated from the two canonical captures, and it promotes the candidate only when the comparison is simultaneous and the reference has its own independent full-rate evidence.
+Therefore an `EXACT` result cannot be introduced through the generic evidence JSON. It must be calculated from the two hash-bound canonical captures, and it promotes the candidate only when the pair has verified synchronization and the reference has its own independent full-rate evidence.
 
 ## Timing remains separate
 
@@ -44,8 +45,7 @@ No interpolation is performed and an exact payload stream does not imply accurat
 
 ```bash
 python -m validation.can_trace_compare \
-  reference.json candidate.json \
-  --simultaneous \
+  reference.json candidate.json pair.json \
   --reference-channel-map reference-channels.json \
   --candidate-channel-map candidate-channels.json \
   --output comparison.json

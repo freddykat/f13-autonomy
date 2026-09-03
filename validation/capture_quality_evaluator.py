@@ -110,11 +110,12 @@ def _normalize_supplemental(raw: dict[str, Any] | None) -> dict[str, Any]:
 def _apply_can_reference_comparison(
     supplemental: dict[str, Any],
     comparison: Any,
-    capture_id: str,
+    capture: dict[str, Any],
 ) -> None:
     if comparison is None:
         return
     from validation.can_trace_compare import CanTraceComparisonReport
+    from validation.capture_pair_manifest import capture_document_sha256
 
     if not isinstance(comparison, CanTraceComparisonReport):
         raise CaptureQualityError("reference_comparison must be a CAN comparison report")
@@ -122,8 +123,11 @@ def _apply_can_reference_comparison(
         comparison.validate()
     except ValueError as exc:
         raise CaptureQualityError(f"invalid CAN reference comparison: {exc}") from exc
+    capture_id = capture.get("capture_id")
     if comparison.candidate_capture_id != capture_id:
         raise CaptureQualityError("reference comparison candidate_capture_id does not match capture")
+    if comparison.candidate_document_sha256 != capture_document_sha256(capture):
+        raise CaptureQualityError("reference comparison candidate document hash does not match capture")
     if supplemental["reference_frame_fidelity"] != "NOT_COMPARED":
         raise CaptureQualityError("CAN reference fidelity cannot be supplied both manually and by comparison")
     if comparison.frame_fidelity == "EXACT" and not comparison.qualifies_candidate(capture_id):
@@ -385,7 +389,7 @@ def evaluate_can_capture(
         )
     supplemental = _normalize_supplemental(supplemental_evidence)
     _apply_can_reference_comparison(
-        supplemental, reference_comparison, capture.get("capture_id")
+        supplemental, reference_comparison, capture
     )
     return _evaluate(
         capture_id=capture.get("capture_id"),

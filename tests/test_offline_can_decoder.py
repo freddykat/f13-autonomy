@@ -3,6 +3,7 @@ import copy
 import pytest
 
 from validation.can_trace_compare import compare_can_captures
+from validation.capture_pair_manifest import build_capture_pair_manifest
 from validation.offline_can_decoder import OfflineDecodeError, decode_capture
 
 
@@ -165,8 +166,19 @@ def test_exact_comparison_qualifies_capture_through_decoder_boundary():
     candidate_capture["rx_queue_depth"] = None
     candidate_capture["rx_dropped_count"] = None
     candidate_capture["rx_overflow_count"] = None
+    pair = build_capture_pair_manifest(
+        reference,
+        candidate_capture,
+        pair_id="decoder-fixture-pair",
+        session_id="decoder-fixture-session",
+        logical_bus="fixture-bus",
+        physical_tap="fixture-passive-tap",
+        same_physical_interval=True,
+        sync_method="OBSERVED_MARKER",
+        sync_evidence="shared fixture marker",
+    )
     comparison = compare_can_captures(
-        reference, candidate_capture, simultaneous=True
+        reference, candidate_capture, pair_manifest=pair
     )
 
     result = decode_capture(

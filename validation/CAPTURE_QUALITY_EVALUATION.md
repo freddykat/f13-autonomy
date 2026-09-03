@@ -101,4 +101,4 @@ Therefore a capture labelled `FULL_RATE_CANDIDATE` with unknown drop/overflow ev
 python -m validation.capture_quality_evaluator capture.json
 ```
 
-Optional supplemental evidence can be supplied with `--evidence evidence.json`. The supplemental object may contain sequence/cycle provenance and statistics or expected-rate validation. For CAN, reference-frame fidelity is never accepted as a manual field; it must come from `validation/can_trace_compare.py` and be passed as a typed comparison report by the offline pipeline.
+Optional supplemental evidence can be supplied with `--evidence evidence.json`. The supplemental object may contain sequence/cycle provenance and statistics or expected-rate validation. For CAN, reference-frame fidelity is never accepted as a manual field; it must come from `validation/can_trace_compare.py`, be bound to both capture-document hashes by `validation/capture_pair_manifest.py`, and be passed as a typed comparison report by the offline pipeline.

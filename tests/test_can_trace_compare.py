@@ -3,8 +3,9 @@ import pytest
 from validation.can_trace_compare import (
     CanTraceComparisonError,
     CanTraceComparisonReport,
-    compare_can_captures,
+    compare_can_captures as _compare_can_captures,
 )
+from validation.capture_pair_manifest import build_capture_pair_manifest
 from validation.capture_quality_evaluator import (
     CaptureQualityError,
     evaluate_can_capture,
@@ -50,6 +51,30 @@ def capture(
             for timestamp, payload in zip(timestamps, payloads)
         ],
     }
+
+
+def compare_can_captures(
+    reference,
+    candidate,
+    *,
+    simultaneous,
+    sync_method="OBSERVED_MARKER",
+    **kwargs,
+):
+    pair = build_capture_pair_manifest(
+        reference,
+        candidate,
+        pair_id="fixture-pair",
+        session_id="fixture-session",
+        logical_bus="fixture-bus",
+        physical_tap="fixture-passive-tap",
+        same_physical_interval=simultaneous,
+        sync_method=sync_method,
+        sync_evidence="fixture marker observed by both recorders",
+    )
+    return _compare_can_captures(
+        reference, candidate, pair_manifest=pair, **kwargs
+    )
 
 
 def test_exact_simultaneous_comparison_promotes_matching_candidate():
@@ -120,6 +145,20 @@ def test_unqualified_reference_cannot_promote_candidate():
     assert evaluate_can_capture(candidate, reference_comparison=comparison).evaluated_quality == "OBSERVATION_ONLY"
 
 
+def test_manual_same_interval_assertion_cannot_claim_exact_fidelity():
+    reference = capture("ref", ["01"], reference_quality=True)
+    candidate = capture("candidate", ["01"])
+    comparison = compare_can_captures(
+        reference,
+        candidate,
+        simultaneous=True,
+        sync_method="MANUAL_ASSERTION",
+    )
+    assert comparison.frame_fidelity == "UNVERIFIED_PAIR"
+    assert comparison.pair_sync_quality == "DECLARED_ONLY"
+    assert evaluate_can_capture(candidate, reference_comparison=comparison).evaluated_quality == "OBSERVATION_ONLY"
+
+
 def test_trusted_per_frame_timing_removes_constant_clock_offset():
     reference = capture(
         "ref", ["01", "02", "03"], timestamps=[100, 200, 300],
@@ -164,6 +203,15 @@ def test_comparison_cannot_be_reused_for_another_capture_id():
     comparison = compare_can_captures(reference, candidate, simultaneous=True)
     with pytest.raises(CaptureQualityError, match="candidate_capture_id"):
         evaluate_can_capture(other, reference_comparison=comparison)
+
+
+def test_comparison_cannot_be_reused_after_candidate_content_changes():
+    reference = capture("ref", ["01"], reference_quality=True)
+    candidate = capture("candidate", ["01"])
+    comparison = compare_can_captures(reference, candidate, simultaneous=True)
+    candidate["adapter"] = "different-adapter"
+    with pytest.raises(CaptureQualityError, match="document hash"):
+        evaluate_can_capture(candidate, reference_comparison=comparison)
 
 
 def test_manual_can_exact_claim_is_rejected():

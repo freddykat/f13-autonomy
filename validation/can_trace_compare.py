@@ -15,12 +15,15 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
+from validation.capture_pair_manifest import CapturePairManifest
+
 
 FRAME_FIDELITIES = {
     "EXACT",
     "MISMATCH",
     "INVALID",
     "NOT_SIMULTANEOUS",
+    "UNVERIFIED_PAIR",
     "UNQUALIFIED_REFERENCE",
 }
 TRUSTED_TIMING = {"per_frame_monotonic", "hardware_timestamp", "reference_export"}
@@ -32,6 +35,11 @@ class CanTraceComparisonError(ValueError):
 
 @dataclass(frozen=True)
 class CanTraceComparisonReport:
+    pair_id: str
+    session_id: str
+    pair_sync_quality: str
+    reference_document_sha256: str
+    candidate_document_sha256: str
     candidate_capture_id: str
     reference_capture_id: str
     simultaneous: bool
@@ -83,6 +91,20 @@ class CanTraceComparisonReport:
             raise CanTraceComparisonError("reference_capture_id must be a non-empty string")
         if not isinstance(self.simultaneous, bool):
             raise CanTraceComparisonError("simultaneous must be boolean")
+        if not isinstance(self.pair_id, str) or not self.pair_id:
+            raise CanTraceComparisonError("pair_id must be a non-empty string")
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise CanTraceComparisonError("session_id must be a non-empty string")
+        if self.pair_sync_quality not in {"VERIFIED", "DECLARED_ONLY", "NOT_SAME_INTERVAL"}:
+            raise CanTraceComparisonError("unsupported pair_sync_quality")
+        for name in ("reference_document_sha256", "candidate_document_sha256"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or len(value) != 64:
+                raise CanTraceComparisonError(f"{name} must be a SHA-256 hex digest")
+            try:
+                bytes.fromhex(value)
+            except ValueError as exc:
+                raise CanTraceComparisonError(f"{name} must be a SHA-256 hex digest") from exc
         if self.frame_fidelity not in FRAME_FIDELITIES:
             raise CanTraceComparisonError("unsupported frame_fidelity")
         if self.reference_capture_quality not in {
@@ -106,6 +128,7 @@ class CanTraceComparisonReport:
         return (
             self.candidate_capture_id == capture_id
             and self.simultaneous
+            and self.pair_sync_quality == "VERIFIED"
             and self.reference_capture_quality == "FULL_RATE_CANDIDATE"
             and self.frame_fidelity == "EXACT"
             and self.reference_rx_count > 0
@@ -222,7 +245,7 @@ def compare_can_captures(
     reference: dict[str, Any],
     candidate: dict[str, Any],
     *,
-    simultaneous: bool,
+    pair_manifest: CapturePairManifest,
     reference_channel_map: dict[str, str] | None = None,
     candidate_channel_map: dict[str, str] | None = None,
     reference_quality_evidence: dict[str, Any] | None = None,
@@ -231,8 +254,9 @@ def compare_can_captures(
     """Compare two captures; the reference must independently qualify as full-rate."""
     if isinstance(max_examples, bool) or not isinstance(max_examples, int) or max_examples < 0:
         raise CanTraceComparisonError("max_examples must be a non-negative integer")
-    if not isinstance(simultaneous, bool):
-        raise CanTraceComparisonError("simultaneous must be true or false")
+    if not isinstance(pair_manifest, CapturePairManifest):
+        raise CanTraceComparisonError("pair_manifest must be a CapturePairManifest")
+    pair_manifest.validate_against(reference, candidate)
 
     reference_map = _validate_channel_map(reference_channel_map, "reference_channel_map")
     candidate_map = _validate_channel_map(candidate_channel_map, "candidate_channel_map")
@@ -286,8 +310,11 @@ def compare_can_captures(
     reference_rx_count = sum(map(len, reference_groups.values()))
     candidate_rx_count = sum(map(len, candidate_groups.values()))
     exact_payload_matches = len(matched_pairs) - payload_mismatches
+    simultaneous = pair_manifest.same_physical_interval
     if not simultaneous:
         frame_fidelity = "NOT_SIMULTANEOUS"
+    elif pair_manifest.sync_quality != "VERIFIED":
+        frame_fidelity = "UNVERIFIED_PAIR"
     elif reference_quality != "FULL_RATE_CANDIDATE":
         frame_fidelity = "UNQUALIFIED_REFERENCE"
     elif reference_rx_count == 0:
@@ -313,6 +340,11 @@ def compare_can_captures(
         timing_fidelity = "TIMING_UNVERIFIED"
 
     report = CanTraceComparisonReport(
+        pair_id=pair_manifest.pair_id,
+        session_id=pair_manifest.session_id,
+        pair_sync_quality=pair_manifest.sync_quality,
+        reference_document_sha256=pair_manifest.reference_document_sha256,
+        candidate_document_sha256=pair_manifest.candidate_document_sha256,
         candidate_capture_id=candidate.get("capture_id"),
         reference_capture_id=reference.get("capture_id"),
         simultaneous=simultaneous,
@@ -340,7 +372,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Compare simultaneous canonical CAN captures offline")
     parser.add_argument("reference", type=Path)
     parser.add_argument("candidate", type=Path)
-    parser.add_argument("--simultaneous", action="store_true", required=True)
+    parser.add_argument("pair_manifest", type=Path)
     parser.add_argument("--reference-channel-map", type=Path)
     parser.add_argument("--candidate-channel-map", type=Path)
     parser.add_argument("--reference-quality-evidence", type=Path)
@@ -351,7 +383,7 @@ def main() -> None:
     report = compare_can_captures(
         load(args.reference),
         load(args.candidate),
-        simultaneous=args.simultaneous,
+        pair_manifest=CapturePairManifest.from_dict(load(args.pair_manifest)),
         reference_channel_map=load(args.reference_channel_map),
         candidate_channel_map=load(args.candidate_channel_map),
         reference_quality_evidence=load(args.reference_quality_evidence),
