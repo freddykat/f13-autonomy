@@ -55,16 +55,10 @@ def test_asc_dlc_mismatch_is_rejected():
 
 def test_non_monotonic_capture_is_rejected():
     with pytest.raises(ValueError, match="monotonic"):
-        import_lines(
-            [
-                "(2.0) can0 123#00",
-                "(1.0) can0 123#01",
-            ],
-            source_format="candump",
-        )
+        import_lines(["(2.0) can0 123#00", "(1.0) can0 123#01"], source_format="candump")
 
 
-def test_capture_document_preserves_listen_only_as_provenance_not_assumption():
+def test_capture_document_preserves_quality_and_listen_only_provenance():
     frames = import_lines(["(1.0) can0 123#00"], source_format="candump")
     document = build_capture_document(
         frames,
@@ -72,8 +66,48 @@ def test_capture_document_preserves_listen_only_as_provenance_not_assumption():
         clock_domain="host_realtime",
         adapter="PCAN-USB-FD",
         listen_only=None,
+        capture_quality="OBSERVATION_ONLY",
+        filter_mode="ACCEPT_ALL",
+        rx_queue_depth=32768,
+        rx_dropped_count=0,
+        rx_overflow_count=0,
     )
+    assert document["schema_version"] == 2
     assert document["mode"] == "read_only_can_capture_import"
     assert document["listen_only"] is None
+    assert document["capture_quality"] == "OBSERVATION_ONLY"
+    assert document["filter_mode"] == "ACCEPT_ALL"
+    assert document["rx_dropped_count"] == 0
     assert document["frame_count"] == 1
     assert document["frames"][0]["timestamp_provenance"] == "capture_tool_timestamp"
+
+
+def test_unknown_counters_remain_null_not_zero():
+    frames = import_lines(["(1.0) can0 123#00"], source_format="candump")
+    document = build_capture_document(
+        frames,
+        capture_id="unknown-quality",
+        clock_domain="host_realtime",
+        adapter="unknown-adapter",
+        listen_only=None,
+    )
+    assert document["capture_quality"] == "UNKNOWN"
+    assert document["rx_queue_depth"] is None
+    assert document["rx_dropped_count"] is None
+    assert document["rx_overflow_count"] is None
+
+
+def test_full_rate_candidate_cannot_contradict_observed_drops():
+    frames = import_lines(["(1.0) can0 123#00"], source_format="candump")
+    with pytest.raises(ValueError, match="drops or overflows"):
+        build_capture_document(
+            frames,
+            capture_id="bad-full-rate",
+            clock_domain="adapter_clock",
+            adapter="fixture",
+            listen_only=True,
+            capture_quality="FULL_RATE_CANDIDATE",
+            filter_mode="SINGLE_ID_HARDWARE",
+            rx_dropped_count=1,
+            rx_overflow_count=0,
+        )
