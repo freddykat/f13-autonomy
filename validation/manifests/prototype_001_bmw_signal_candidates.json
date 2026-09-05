@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "manifest_id": "prototype-001-bmw-signal-candidates",
+  "vehicle_profile": "prototype-001-f13-650i-xdrive-2012",
+  "mode": "read_only_research_candidates",
+  "actuation_authority": "NONE",
+  "allowed_confidence": [
+    "DOCUMENTED_FAMILY",
+    "COMMUNITY_CORROBORATED",
+    "SPECULATIVE"
+  ],
+  "promotion_target": "validation/manifests/prototype_001_bmw_decoders.json",
+  "candidates": [
+    {
+      "id": "front_acc_radar",
+      "priority": "P0",
+      "ecu_family": "FRR_10",
+      "diagnostic_address": "0x21",
+      "f13_family_documented": true,
+      "transport": "UNKNOWN",
+      "confidence": "DOCUMENTED_FAMILY",
+      "target_interface": "RadarData/radarTracks",
+      "wanted_semantics": [
+        "acc_state",
+        "set_speed",
+        "following_gap",
+        "selected_lead_valid",
+        "lead_distance",
+        "lead_relative_velocity",
+        "lead_lateral_offset",
+        "track_id",
+        "track_validity"
+      ],
+      "evidence": [
+        {
+          "type": "ediabas_inventory",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/T_INPA.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "FRR_10 is a Full Range Radar ECU family explicitly associated with F12/F13."
+        }
+      ]
+    },
+    {
+      "id": "blind_spot_lane_change_warning",
+      "priority": "P0",
+      "ecu_family": "HC2_01",
+      "diagnostic_address": "0x08",
+      "f13_family_documented": true,
+      "transport": "UNKNOWN",
+      "confidence": "DOCUMENTED_FAMILY",
+      "target_interface": "CarState.leftBlindspot/rightBlindspot",
+      "wanted_semantics": [
+        "left_warning",
+        "right_warning",
+        "sensor_available",
+        "sensor_health",
+        "warning_stage",
+        "stale_or_invalid"
+      ],
+      "evidence": [
+        {
+          "type": "ediabas_inventory",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/T_INPA.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "HC2_01 is a lane-change-warning ECU family explicitly associated with F12/F13."
+        },
+        {
+          "type": "ediabas_sgbd",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/hc2_01.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "HC2 exposes initialization/calibration diagnostic states."
+        }
+      ]
+    },
+    {
+      "id": "chassis_motion",
+      "priority": "P0",
+      "ecu_family": "ICM_25",
+      "diagnostic_address": "0x1C",
+      "f13_family_documented": true,
+      "transport": "UNKNOWN",
+      "confidence": "DOCUMENTED_FAMILY",
+      "target_interface": "BMWChassisState",
+      "wanted_semantics": [
+        "vehicle_speed",
+        "steering_angle",
+        "steering_rate",
+        "yaw_rate",
+        "lateral_acceleration",
+        "longitudinal_acceleration",
+        "rear_steer_state"
+      ],
+      "evidence": [
+        {
+          "type": "ediabas_inventory",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/T_INPA.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "ICM_25 is Integrated Chassis Management explicitly associated with F12/F13."
+        },
+        {
+          "type": "ediabas_sgbd",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/icm_25.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "ICM diagnostic semantics include yaw-rate, lateral-acceleration and steering-angle related states."
+        }
+      ]
+    },
+    {
+      "id": "dsc_motion_and_intervention",
+      "priority": "P0",
+      "ecu_family": "DSC",
+      "diagnostic_address": "0x29",
+      "f13_family_documented": false,
+      "transport": "UNKNOWN",
+      "confidence": "SPECULATIVE",
+      "target_interface": "BMWVehicleState.chassis",
+      "wanted_semantics": [
+        "wheel_speed_fl",
+        "wheel_speed_fr",
+        "wheel_speed_rl",
+        "wheel_speed_rr",
+        "brake_state",
+        "dsc_intervention",
+        "abs_intervention",
+        "traction_intervention"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "kafas_tlc_observation",
+      "priority": "P1",
+      "ecu_family": "KAFAS/TLC",
+      "diagnostic_address": "0x5D",
+      "f13_family_documented": false,
+      "transport": "UNKNOWN",
+      "confidence": "SPECULATIVE",
+      "target_interface": "WorldState corroboration",
+      "wanted_semantics": [
+        "lane_state",
+        "lane_departure_warning",
+        "traffic_sign_state",
+        "fcw_state",
+        "object_state"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "gear_selector",
+      "priority": "P1",
+      "ecu_family": "GWS2",
+      "diagnostic_address": "0x5E",
+      "f13_family_documented": true,
+      "transport": "UNKNOWN",
+      "confidence": "DOCUMENTED_FAMILY",
+      "target_interface": "BMWVehicleState.powertrain",
+      "wanted_semantics": [
+        "selected_gear",
+        "drive_reverse_neutral_park",
+        "manual_mode"
+      ],
+      "evidence": [
+        {
+          "type": "ediabas_inventory",
+          "source": "emdzej/ediabasx-docs-sgbd",
+          "path": "docs/sgbd/T_INPA.md",
+          "snapshot": "b644de8fbfbb4b207f57794e3c7894dc1dc58627",
+          "claim": "GWS2 is explicitly associated with F12/F13."
+        }
+      ]
+    }
+  ]
+}
