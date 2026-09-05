@@ -1,0 +1,79 @@
+{
+  "vehicle": {
+    "timestampMs": 0,
+    "speedKph": 96.0,
+    "rpm": 2350,
+    "gear": "D6",
+    "fuelPercent": 58.0,
+    "outsideTempC": 18.5,
+    "driveMode": "COMFORT",
+    "speedLimitKph": 100,
+    "warningIds": [],
+    "dataHealthy": true
+  },
+  "navigation": {
+    "sequence": 42,
+    "timestampMs": 0,
+    "status": "ACTIVE",
+    "destination": "Rotterdam",
+    "currentRoad": "A20",
+    "nextRoad": "A20 Rotterdam",
+    "maneuver": "RAMP_RIGHT",
+    "maneuverDistanceM": 420,
+    "exitNumber": "14",
+    "roundaboutExit": null,
+    "etaEpochMs": null,
+    "remainingDistanceM": 38600,
+    "remainingDurationS": 1620,
+    "latitude": 51.93,
+    "longitude": 4.48,
+    "routePolyline": [],
+    "lanes": [
+      {"directions": ["STRAIGHT"], "recommended": false},
+      {"directions": ["STRAIGHT", "RAMP_RIGHT"], "recommended": true},
+      {"directions": ["RAMP_RIGHT"], "recommended": true}
+    ]
+  },
+  "media": {
+    "sequence": 7,
+    "timestampMs": 0,
+    "source": "SPOTIFY",
+    "playback": "PLAYING",
+    "title": "Insomnia",
+    "artist": "Faithless",
+    "album": "Reverence",
+    "station": null,
+    "frequencyMhz": null,
+    "positionMs": 133000,
+    "durationMs": 527000,
+    "artworkId": "demo-faithless-insomnia",
+    "canPlayPause": true,
+    "canNext": true,
+    "canPrevious": true,
+    "canSeek": true
+  },
+  "phone": {
+    "state": "IDLE",
+    "displayName": null,
+    "number": null,
+    "callDurationS": null
+  },
+  "adas": {
+    "timestampMs": 0,
+    "available": true,
+    "engaged": false,
+    "setSpeedKph": 100,
+    "leadVisible": true,
+    "laneLeftVisible": true,
+    "laneRightVisible": true,
+    "takeoverRequired": false,
+    "message": null
+  },
+  "preferences": {
+    "radioNavMode": "OFF",
+    "clusterNavMode": "MAP",
+    "hudNavMode": "GUIDANCE",
+    "clusterMediaMode": "COMPACT",
+    "theme": "OEM_PLUS"
+  }
+}
