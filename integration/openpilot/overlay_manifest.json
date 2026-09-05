@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "target_openpilot_commit": "044640668aa25d5c72f948ec072bfc259d1b269a",
+  "target_opendbc_commit": "b4ef5e1cf406ff143fa67bdbfb154739d43279c9",
+  "phase": "SHADOW_ONLY",
+  "actuation_authority": "NONE",
+  "components": [
+    {
+      "name": "bmw_carstate",
+      "target": "opendbc_repo/opendbc/car/bmw/carstate.py",
+      "state": "PLANNED",
+      "consumes": [
+        "verified_bmw_can"
+      ],
+      "publishes": [
+        "carState"
+      ],
+      "write_capable": false
+    },
+    {
+      "name": "bmw_acc_radar",
+      "target": "opendbc_repo/opendbc/car/bmw/radar_interface.py",
+      "state": "PLANNED",
+      "consumes": [
+        "verified_acc_sen_tracks"
+      ],
+      "publishes": [
+        "radarTracks"
+      ],
+      "write_capable": false
+    },
+    {
+      "name": "bmw_interface",
+      "target": "opendbc_repo/opendbc/car/bmw/interface.py",
+      "state": "PLANNED",
+      "consumes": [
+        "bmw_carstate",
+        "bmw_acc_radar"
+      ],
+      "publishes": [
+        "dashcamOnly_car_params"
+      ],
+      "write_capable": false
+    },
+    {
+      "name": "our_camerad",
+      "target": "external_sidecar",
+      "state": "PLANNED",
+      "consumes": [
+        "synchronized_camera_frames"
+      ],
+      "publishes": [
+        "VisionIPC"
+      ],
+      "write_capable": false
+    }
+  ],
+  "prohibitions": {
+    "carcontroller": false,
+    "sendcan": false,
+    "panda_safety_patch": false,
+    "flexray_tx": false,
+    "tesla_to_bmw_command_translation": false
+  }
+}

@@ -2,24 +2,22 @@
 
 ## Development philosophy
 
-Start with the cheapest hardware that allows useful logging, replay, model execution and interface development. Scale GPU/camera hardware only when measurements justify it.
+Start the physical Beta from a supported upstream hardware/runtime combination: comma four, Panda and the locked openpilot release. Scale sidecar GPU/camera hardware only when measurements justify it.
 
 ## Development compute
 
-Initial target:
+Initial in-car target:
 
-- affordable x86-64 platform
-- 32–64 GB RAM
-- 1–2 TB NVMe minimum
-- NVIDIA GPU with enough VRAM for current openpilot/model experiments
-- Ethernet/USB/PCIe expansion
-- robust DC/DC power strategy for vehicle use later
+- comma four for upstream cameras, driver monitoring, openpilot runtime and route logging
+- Panda-compatible read-only CAN connection
+- independent deterministic BMW/FlexRay logger where Panda cannot see the required bus
+- optional sidecar computer for 360-camera capture and offline/world-model experiments
 
-A high-end RTX 5080 is not required for early development. The architecture should allow a later GPU upgrade without redesigning the software interfaces.
+An x86-64/NVIDIA workstation remains useful for replay and later perception research, but it is not required in the car for the first Beta. A high-end RTX 5080 is not an early dependency.
 
 ## Camera system
 
-Prototype phase may begin with a small synchronized set, then expand toward:
+The comma camera set is the first model input. A separate synchronized surround set may then expand toward:
 
 - front tele
 - front main
@@ -31,7 +29,7 @@ Prototype phase may begin with a small synchronized set, then expand toward:
 
 Final target should favour automotive HDR sensors, hardware synchronization and automotive transport such as GMSL-class links.
 
-## Camera interface
+## Sidecar camera interface
 
 Desired capabilities:
 

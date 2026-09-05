@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Reproducible external checkout created by tools/openpilot_workspace.py.
+.openpilot-workspace/
+
+# Local captures and generated reports must be deliberately curated before commit.
+captures/
+reports/

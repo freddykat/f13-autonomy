@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-04",
+  "openpilot": {
+    "repository": "https://github.com/commaai/openpilot.git",
+    "release": "0.11.2",
+    "ref": "refs/heads/zeroeleventwo",
+    "commit": "044640668aa25d5c72f948ec072bfc259d1b269a"
+  },
+  "critical_submodules": {
+    "opendbc_repo": {
+      "repository": "https://github.com/commaai/opendbc.git",
+      "commit": "b4ef5e1cf406ff143fa67bdbfb154739d43279c9"
+    },
+    "panda": {
+      "repository": "https://github.com/commaai/panda.git",
+      "commit": "dd8a5b3df77706337a11555377e7180c5adc8726"
+    }
+  },
+  "tracking_snapshot": {
+    "ref": "refs/heads/master",
+    "observed_commit": "e3def37695339d5d2f5e76e815ebb7570bcfdbd5",
+    "observed_at": "2026-09-04"
+  },
+  "safety_policy": {
+    "default_mode": "SHADOW_ONLY",
+    "actuation_authority": "NONE",
+    "allow_sendcan": false,
+    "allow_bmw_controller": false,
+    "allow_panda_safety_changes": false,
+    "allow_flexray_tx": false
+  }
+}

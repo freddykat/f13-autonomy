@@ -2,7 +2,9 @@
 
 ## Goal
 
-Build an independent openpilot-based autonomy stack for a BMW F13, with Tesla HW4/FSD used only as a read-only behavioural teacher/benchmark.
+Integrate the BMW F13 around a reproducible upstream openpilot build, with Tesla HW4/FSD used only as a read-only behavioural verification benchmark.
+
+The first executable system is openpilot `0.11.2` on comma/Panda hardware in shadow/no-output mode. The exact upstream and submodule commits are recorded in `upstream/openpilot.lock.json`.
 
 ## Core domains
 
@@ -12,29 +14,36 @@ Build an independent openpilot-based autonomy stack for a BMW F13, with Tesla HW
 4. **Vehicle domain** — BMW state extraction and command abstraction over CAN/FlexRay.
 5. **Safety domain** — independent MCU watchdog, plausibility checks, driver override and fail-safe behaviour.
 
-## Intended data flow
+## M0/M1 data flow
 
-```text
-Custom Cameras ─┐
-BMW Radar ──────┤
-KAFAS/PDC ──────┤──> worldmodeld ──┐
-GNSS/IMU ───────┘                  │
-                                   ├──> metaplannerd ──> bmwcontrold ──> Safety MCU ──> BMW
-openpilot modeld ──────────────────┤
-                                   │
-Tesla HW4/FSD ──> teslaoracled ───┘
+```mermaid
+flowchart TB
+    CAM["comma cameras"] --> OP["openpilot 0.11.2 shadow"]
+    CAN["ZGM / OBD CAN"] --> BMW["BMW opendbc observation"]
+    ACC["ACC-SEN + SWW"] --> BMW
+    AUX["KAFAS + 360 + GNSS/IMU"] --> WORLD["worldmodeld sidecars"]
+    OP --> LOG["synchronized evidence log"]
+    BMW --> LOG
+    WORLD --> LOG
+    TESLA["Tesla evidence corpus"] --> TGATE["benchmark gate"]
+    TGATE --> REVIEW["offline disagreement review"]
+    LOG --> REVIEW
 ```
+
+No component in this M0/M1 graph transmits a BMW vehicle command.
 
 ## Software boundaries
 
-- `our_camerad`: custom synchronized camera capture into VisionIPC-compatible interfaces.
-- `bmwstated`: BMW vehicle state from CAN/FlexRay/OEM sensors.
+- upstream camera/model path: comma road/wide/cabin streams for the first Beta.
+- `our_camerad`: later custom synchronized camera experiments behind VisionIPC-compatible interfaces.
+- BMW `opendbc` package: standard `CarState` plus front ACC `RadarInterface`, initially read-only and `dashcamOnly`.
+- `bmwstated`: richer BMW state from CAN/FlexRay/OEM sensors outside the minimum openpilot interface.
 - `worldmodeld`: fused ego-centric representation.
-- `teslaoracled`: read-only Tesla HW4/FSD benchmark state.
+- `teslaoracled`: read-only Tesla HW4/FSD benchmark state admitted only through the benchmark provenance gate.
 - `metaplannerd`: combines openpilot, world-model safety, route intent and benchmark comparison.
 - `bmwcontrold`: converts abstract vehicle commands into BMW-specific requests.
 
-## VehicleCommand abstraction
+## Later VehicleCommand abstraction
 
 ```text
 VehicleCommand {
@@ -46,7 +55,7 @@ VehicleCommand {
 }
 ```
 
-The autonomy stack should not expose direct low-level motor/brake commands above `bmwcontrold`.
+The autonomy stack should not expose direct low-level motor/brake commands above `bmwcontrold`. This interface is a later design contract and is not enabled by the shadow build.
 
 ## Operating modes
 

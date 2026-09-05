@@ -9,25 +9,33 @@ Goals:
 - record synchronized camera data
 - record BMW CAN
 - begin FlexRay capture
-- run openpilot live/offline on development compute
+- prepare and verify the locked upstream openpilot 0.11.2 build
+- run openpilot live/offline on comma hardware or a verified replay host
 - simulate Tesla benchmark state
 - visualize proposed decisions
 - save disagreement events
 
 Exit criteria: repeatable logging/replay and a working comparison pipeline.
 
-## M1 — Tesla Teacher
+## M1 — Sensor Shadow Beta
 
-Add genuine HW4/FSD read-only observation.
+Run the locked openpilot build on the F13 with no vehicle output.
 
 Goals:
 
-- decode useful observable DAS/FSD state
-- feed it into `teslaoracled`
-- compare Tesla/openpilot/human behaviour
-- identify OTA-version compatibility issues
+- use comma road/wide/cabin cameras and driver monitoring
+- receive BMW CAN through Panda/ZGM/OBD
+- populate verified `CarState` fields
+- populate front ACC `radarTracks` if the required objects reach the capture bus
+- populate SWW left/right blind-spot state
+- record KAFAS and extra 360-camera observations through sidecars
+- preserve raw data, loss counters, timestamps and decoder provenance
 
-Exit criteria: stable benchmark data during real-world manual driving or validated replay.
+Exit criteria: repeatable real-car shadow logging and replay with Panda `noOutput`, no BMW controller and no transmission path.
+
+## Parallel track — Tesla verification
+
+Collect genuine Tesla/openpilot shadow episodes where practical and qualify them with `validation/tesla_benchmark_gate.py`. Matched but non-simultaneous scenarios remain explicitly lower-confidence. Tesla verification is not required to start the BMW Sensor Shadow Beta.
 
 ## M2 — BMW Shadow
 

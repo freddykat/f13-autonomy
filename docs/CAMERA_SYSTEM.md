@@ -2,7 +2,7 @@
 
 ## Objective
 
-Provide synchronized, low-latency 360-degree perception while keeping openpilot-facing interfaces as stable as possible.
+Use the comma road/wide/cabin cameras as the known openpilot input for the first Beta, while developing synchronized, low-latency 360-degree perception as a separate evidence/world-model layer.
 
 ## Initial concept
 
@@ -23,25 +23,29 @@ The final camera count is deliberately open. Angular coverage, overlap, HDR, syn
 
 ## Development stages
 
-### Stage A — minimum useful prototype
+### Stage A — openpilot shadow baseline
 
-Start with a small synchronized subset that can support logging, openpilot adaptation and lane-change perception development.
+Run the locked upstream model with the comma cameras. Log calibration, frame timing, dropped frames and model outputs without BMW actuation.
 
-### Stage B — highway coverage
+### Stage B — minimum useful sidecar
+
+Start with a small synchronized side/rear subset that supports logging and lane-change/blind-spot comparison. Do not disguise these views as upstream road/wide streams.
+
+### Stage C — highway surround coverage
 
 Add rear/side overlap for blind spots, fast-approaching vehicles, merges and automatic lane changes.
 
-### Stage C — full world perception
+### Stage D — full world perception
 
 Expand toward 360-degree occupancy/world modelling if the measured value justifies the added bandwidth and compute.
 
 ## Transport
 
-Prototype transport may use USB/development capture hardware. Final vehicle target should favour automotive links such as GMSL-class transport with a common clock and robust connectors/cabling.
+Prototype sidecar transport may use USB/development capture hardware. Final vehicle target should favour automotive links such as GMSL-class transport with a common clock and robust connectors/cabling. Extra cameras remain separate from the upstream model until their image geometry, timing and calibration have been validated.
 
 ## openpilot integration
 
-Preferred abstraction:
+Later custom-camera abstraction:
 
 ```text
 camera sensors

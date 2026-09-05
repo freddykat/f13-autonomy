@@ -1,12 +1,23 @@
 # BMW F13 Autonomy
 
-Experimental openpilot-based autonomy project for a BMW F13 using custom perception hardware, BMW CAN/FlexRay integration, and Tesla HW4/FSD as a behavioural teacher and benchmark.
+Experimental BMW F13 integration built around a reproducible upstream openpilot release, BMW CAN/FlexRay observation and Tesla HW4/FSD as a behavioural verification benchmark.
 
 > **The goal is not to put Tesla FSD into a BMW.** The goal is to use Tesla HW4/FSD as an evolving behavioural teacher and benchmark while developing an independent openpilot-based autonomy stack for the BMW F13.
 
 ## Project status
 
-Research, architecture and hardware-planning phase. The first target is deliberately limited to **supervised motorway/highway autonomy**. Development begins with logging, replay, shadow mode and hardware-in-the-loop before experimental actuation.
+Research, architecture and hardware-planning phase. The first executable target is **openpilot 0.11.2 on comma hardware in shadow/no-output mode**. Supervised motorway/highway autonomy remains the later vehicle target; development begins with logging, replay, shadow mode and hardware-in-the-loop before experimental actuation.
+
+## Executable baseline
+
+The upstream base is locked in `upstream/openpilot.lock.json` rather than following a moving branch. The current baseline is openpilot `0.11.2` at commit `044640668aa25d5c72f948ec072bfc259d1b269a`, including its exact `opendbc` and Panda submodule commits.
+
+```bash
+python tools/openpilot_workspace.py validate
+python tools/openpilot_workspace.py prepare .openpilot-workspace/openpilot-0.11.2 --with-submodules
+```
+
+See `docs/OPENPILOT_BASELINE.md` for the BMW integration boundary and upgrade procedure.
 
 ## Background
 
@@ -19,11 +30,11 @@ We welcome collaboration from developers familiar with openpilot/comma/panda, Te
 ## Core idea
 
 ```text
-openpilot
-+ custom synchronized cameras
-+ GPU compute
+locked upstream openpilot 0.11.2
++ comma four / Panda for the first Beta
 + BMW OEM sensors
-+ 360-degree perception
++ ACC-SEN front radar + SWW blind-spot radar
++ KAFAS and synchronized 360-degree sidecar perception
 + Tesla HW4/FSD behavioural benchmark
 + BMW CAN/FlexRay integration
 ```
@@ -32,35 +43,20 @@ The BMW should ultimately operate **without Tesla HW4**. HW4 is intended as a te
 
 ## High-level architecture
 
-```text
-                   ROAD ENVIRONMENT
-                          |
-          +---------------+----------------+
-          |               |                |
-   Custom Cameras     BMW Sensors     Tesla Cameras
-          |               |                |
-          v               v                v
-     GPU Compute      Radar/KAFAS       Tesla HW4
-          |               |              + FSD
-          +-------+-------+                |
-                  |                        |
-                  v                        v
-             WORLD MODEL              FSD BENCHMARK
-                  |                        |
-                  +-----------+------------+
-                              v
-                         META-PLANNER
-                              |
-                              v
-                         SAFETY LAYER
-                              |
-                              v
-                     BMW CONTROL BRIDGE
-                              |
-                      CAN / CAN-FD / FlexRay
-                              |
-                    EPS / DSC / DME / ICM
+```mermaid
+flowchart TB
+    CAM["comma road/wide/cabin cameras"] --> OP["Locked openpilot 0.11.2"]
+    BMW["F13 CAN through ZGM/OBD"] --> ODBC["BMW opendbc: CarState + radarTracks"]
+    AUX["KAFAS + 360 sidecar"] --> WM["worldmodeld observations"]
+    OP --> LOG["Synchronized shadow log"]
+    ODBC --> LOG
+    WM --> LOG
+    TESLA["Qualified Tesla benchmark corpus"] --> GATE["Tesla benchmark gate"]
+    GATE --> REVIEW["Offline disagreement review"]
+    LOG --> REVIEW
 ```
+
+This is the current shadow architecture. The later BMW control bridge remains outside the executable Beta until separate replay, HIL, safety-controller and closed-course gates are passed.
 
 ## Operating modes
 
@@ -119,11 +115,11 @@ teslaoracled
 
 HW4 has no direct authority over BMW steering or braking.
 
-## Custom openpilot hardware
+## Openpilot runtime strategy
 
-The final system is not intended to require a comma device. We want openpilot on our own cost-effective compute platform, scaling GPU performance later as multi-camera perception, occupancy, BEV, world modelling and larger models demand it.
+The first physical Beta uses a comma device and Panda because that gives the project a known openpilot camera, driver-monitoring, logging and vehicle-interface base. Custom compute remains an optional later optimization for multi-camera perception, occupancy, BEV and larger-model experiments.
 
-We want to preserve upstream interfaces wherever practical rather than maintaining a deep fork.
+We preserve upstream interfaces and keep BMW additions in the `opendbc` vehicle boundary wherever practical. Extra 360-degree cameras are initially recorded and processed by a synchronized sidecar; they are not presented to the upstream driving model as fictitious road/wide streams.
 
 ```text
 custom cameras
@@ -213,6 +209,10 @@ The aim is to keep upstream openpilot changes as small and reviewable as possibl
 ```text
 f13-autonomy/
 ├── README.md
+├── upstream/
+│   └── openpilot.lock.json
+├── integration/
+│   └── openpilot/
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── HARDWARE.md
@@ -237,6 +237,7 @@ f13-autonomy/
 │   ├── fake_bmw/
 │   └── scenarios/
 ├── tools/
+│   ├── openpilot_workspace.py
 │   ├── log_viewer/
 │   ├── disagreement_viewer/
 │   └── dataset_builder/
@@ -247,7 +248,7 @@ f13-autonomy/
 
 **M0 — Shadow Lab:** cameras + BMW CAN/FlexRay logging, openpilot execution, fake Tesla oracle, decision visualization and disagreement storage. No actuation.
 
-**M1 — Tesla Teacher:** genuine HW4/FSD read-only observation while the BMW is manually driven.
+**M1 — Sensor Shadow Beta:** locked openpilot build + comma cameras + passive BMW CAN/ACC/SWW/KAFAS observation. Tesla datasets remain an independent verification track rather than a Beta runtime dependency.
 
 **M2 — BMW Shadow:** `bmwcontrold` calculates but does not transmit commands; compare proposed steering/acceleration with human action.
 
