@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "manifest_id": "prototype-001-bmw-semantic-targets",
+  "mode": "read_only_pre_vehicle_correlation",
+  "actuation_authority": "NONE",
+  "vehicle_validated": false,
+  "targets": [
+    {
+      "semantic": "OBJDT_HDWOBS",
+      "source_family": "FRR",
+      "documented_consumer_context": "ICM-family fault semantics",
+      "meaning": "front-surveillance/radar object data",
+      "confidence": "DOCUMENTED_SEMANTIC",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["LEAD_ACQUIRE", "LEAD_LOSS", "LEAD_CLOSING", "LEAD_OPENING"]
+    },
+    {
+      "semantic": "DT_LNDT_*",
+      "source_family": "KAFAS",
+      "documented_consumer_context": "FRR_10 fault semantics",
+      "meaning": "lane-detection data",
+      "confidence": "DOCUMENTED_SEMANTIC",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["STEER_LEFT_SLOW", "STEER_RIGHT_SLOW", "STEER_CENTER"]
+    },
+    {
+      "semantic": "ST_OBJDT_KAFAS",
+      "source_family": "KAFAS",
+      "documented_consumer_context": "FRR_10 fault semantics",
+      "meaning": "KAFAS object-data status",
+      "confidence": "DOCUMENTED_SEMANTIC",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["LEAD_ACQUIRE", "LEAD_LOSS"]
+    },
+    {
+      "semantic": "HC2_LEFT_WARNING",
+      "source_family": "HC2_01",
+      "documented_consumer_context": "F12/F13 lane-change-warning family",
+      "meaning": "left blind-zone/lane-change warning candidate",
+      "confidence": "CORRELATION_TARGET",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["BLIND_LEFT_ENTER", "BLIND_LEFT_EXIT"]
+    },
+    {
+      "semantic": "HC2_RIGHT_WARNING",
+      "source_family": "HC2_01",
+      "documented_consumer_context": "F12/F13 lane-change-warning family",
+      "meaning": "right blind-zone/lane-change warning candidate",
+      "confidence": "CORRELATION_TARGET",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["BLIND_RIGHT_ENTER", "BLIND_RIGHT_EXIT"]
+    },
+    {
+      "semantic": "ICM_YAW_RATE",
+      "source_family": "ICM_25",
+      "documented_consumer_context": "ICM diagnostic semantics",
+      "meaning": "vehicle yaw-rate observation candidate",
+      "confidence": "CORRELATION_TARGET",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["STEER_LEFT_SLOW", "STEER_RIGHT_SLOW", "STEER_CENTER"]
+    },
+    {
+      "semantic": "ICM_LATERAL_ACCEL",
+      "source_family": "ICM_25",
+      "documented_consumer_context": "ICM diagnostic semantics",
+      "meaning": "lateral-acceleration observation candidate",
+      "confidence": "CORRELATION_TARGET",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["STEER_LEFT_SLOW", "STEER_RIGHT_SLOW"]
+    },
+    {
+      "semantic": "ICM_STEERING_ANGLE",
+      "source_family": "ICM_25",
+      "documented_consumer_context": "ICM diagnostic semantics",
+      "meaning": "steering-angle observation candidate",
+      "confidence": "CORRELATION_TARGET",
+      "transport": "UNKNOWN",
+      "frame_id": null,
+      "correlate_with": ["STEER_LEFT_SLOW", "STEER_RIGHT_SLOW", "STEER_CENTER"]
+    }
+  ],
+  "rules": {
+    "automatic_decoder_promotion": false,
+    "allow_live_transmit": false,
+    "require_human_review": true,
+    "require_replay_regression": true,
+    "require_measured_timing": true,
+    "unknown_transport_is_allowed_pre_vehicle": true
+  }
+}
