@@ -4,9 +4,16 @@ Status: architecture baseline for M0/M1 shadow development. **No vehicle actuati
 
 ## Decision
 
-Prototype 001 should use a stock/current **Comma Four + official openpilot release** as the reference runtime before attempting a deep custom-compute fork.
+Prototype 001 should use a stock/current **Comma Four + reviewed upstream openpilot baseline** as the reference runtime before attempting a deep custom-compute fork.
 
-As of 2026-09-05 the latest published `commaai/openpilot` GitHub release is **v0.11.1** (published 2026-06-05). Development work such as Chestnut/external-GPU support may be evaluated separately against upstream `master`, but it must not silently change the validated vehicle baseline.
+As of 2026-09-05, two upstream release facts must remain distinct:
+
+- the newest published `v*` Git tag is **v0.11.1**;
+- upstream `RELEASES.md` declares **0.11.2**, and the official `zeroeleventwo` branch resolves to commit `044640668aa25d5c72f948ec072bfc259d1b269a`.
+
+Prototype 001 deliberately pins that exact reviewed `zeroeleventwo` commit, together with its opendbc and Panda gitlinks, as the shadow baseline. It must not be described as a published `v0.11.2` tag while no such tag exists. Newer Chestnut/external-GPU work may be evaluated separately against upstream `master`, but it must not silently change the validated vehicle baseline.
+
+The machine-readable pins are in `upstream/openpilot.lock.json`; preparation and verification instructions are in `docs/OPENPILOT_BASELINE.md`.
 
 Record for every replay/benchmark:
 
@@ -157,7 +164,7 @@ M0/M1 integration artifacts must satisfy all of the following:
 
 ## Promotion sequence
 
-1. Official openpilot + Comma Four baseline recorded and reproducible.
+1. Reviewed, commit-locked openpilot + Comma Four baseline recorded and reproducible.
 2. Passive OBD/gateway CAN inventory.
 3. Offline BMW decoder manifest entries with evidence.
 4. ACC radar and SWW replay adapters.
