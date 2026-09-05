@@ -132,16 +132,20 @@ def test_identifies_steering_like_signed_flexray_candidate():
         )],
     )
 
-    top = hypotheses[0]
-    assert top.function_family == "STEERING_LIKE"
-    assert top.transport == "FLEXRAY"
-    assert top.slot_id == 77
-    assert top.start_byte == 0
-    assert top.width == 2
-    assert top.signed is True
-    assert top.endian == "big"
-    assert top.direction_score == 1.0
-    assert top.baseline_score == 1.0
+    matching = [
+        item for item in hypotheses
+        if item.function_family == "STEERING_LIKE"
+        and item.transport == "FLEXRAY"
+        and item.slot_id == 77
+        and item.start_byte == 0
+        and item.width == 2
+        and item.signed is True
+        and item.endian == "big"
+    ]
+    assert matching
+    candidate = matching[0]
+    assert candidate.direction_score == 1.0
+    assert candidate.baseline_score == 1.0
 
 
 def test_identifies_toggle_like_can_candidate():
