@@ -6,6 +6,8 @@ Tesla HW4/FSD is used as a read-only behavioural teacher and benchmark for the B
 
 The long-term BMW stack must remain independent from Tesla hardware.
 
+The executable driving base is the locked upstream openpilot build described in `OPENPILOT_BASELINE.md`. Tesla evidence is admitted through `validation/tesla_benchmark_gate.py`; it is not merged into the openpilot build or translated into BMW commands.
+
 ## Non-goals
 
 - No redistribution of Tesla proprietary firmware or model weights.
@@ -49,6 +51,8 @@ human driver
 ```
 
 Disagreements become high-value replay, review and training cases.
+
+The preferred verification dataset runs openpilot in no-output shadow mode alongside genuine Tesla behaviour on the same physical episode. A separately driven but similar scenario remains useful, but is explicitly classified `SCENARIO_BENCHMARK_ONLY`. See `validation/TESLA_BENCHMARK_GATE.md`.
 
 ## Bench research questions
 

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "episode_id": "synthetic-hw4-shadow-001",
+  "comparison_mode": "SAME_EPISODE",
+  "actuation_authority": "NONE",
+  "openpilot": {
+    "baseline_commit": "044640668aa25d5c72f948ec072bfc259d1b269a",
+    "model_artifact": "driving_supercombo-0.11.2-fixture",
+    "capture_id": "synthetic-openpilot-capture-001",
+    "clock_domain": "fixture-monotonic-clock",
+    "timing_provenance": "PER_FRAME_MONOTONIC",
+    "capture_quality": "FULL_RATE_CANDIDATE",
+    "camera_dropped_frame_count": 0,
+    "model_skipped_frame_count": 0
+  },
+  "tesla": {
+    "hardware_generation": "HW4",
+    "vehicle_platform": "SYNTHETIC_FIXTURE",
+    "firmware_version": "SYNTHETIC",
+    "fsd_version": "SYNTHETIC",
+    "capture_id": "synthetic-tesla-capture-001",
+    "bus": "fixture-observation-bus",
+    "physical_tap": "fixture-passive-tap",
+    "decoder_version": "fixture-decoder-v1",
+    "clock_domain": "fixture-monotonic-clock",
+    "timing_provenance": "PER_FRAME_MONOTONIC",
+    "capture_quality": "FULL_RATE_CANDIDATE",
+    "filter_mode": "FIXTURE_HARDWARE_FILTER",
+    "rx_dropped_count": 0,
+    "rx_overflow_count": 0,
+    "write_path_present": false
+  },
+  "alignment": {
+    "method": "SHARED_MONOTONIC_CLOCK",
+    "max_error_ms": 5.0
+  },
+  "signals": [
+    {
+      "name": "lane_change_state",
+      "status": "CROSS_SOURCE_VALIDATED",
+      "value": "NONE",
+      "unit": "enum",
+      "evidence": [
+        "CAN_OBSERVATION",
+        "UI_VIDEO"
+      ]
+    },
+    {
+      "name": "desired_speed_mps",
+      "status": "OBSERVED",
+      "value": 27.8,
+      "unit": "m/s",
+      "evidence": [
+        "CAN_OBSERVATION"
+      ]
+    },
+    {
+      "name": "forward_collision_warning",
+      "status": "UNKNOWN",
+      "value": null,
+      "unit": "tri_state",
+      "evidence": []
+    }
+  ]
+}
