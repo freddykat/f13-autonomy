@@ -1,0 +1,70 @@
+{
+  "mode": "OFFLINE_READ_ONLY_DISCOVERY",
+  "vehicle": "BMW F13 prototype_001",
+  "status": "UNVALIDATED_EVENT_SIGNATURES",
+  "functions": [
+    {
+      "name": "STEERING_LIKE",
+      "kind": "opposed_continuous",
+      "positive_event": "STEER_LEFT_SLOW",
+      "negative_event": "STEER_RIGHT_SLOW",
+      "baseline_event": "STEER_CENTER"
+    },
+    {
+      "name": "YAW_LIKE",
+      "kind": "opposed_continuous",
+      "positive_event": "CURVE_LEFT",
+      "negative_event": "CURVE_RIGHT",
+      "baseline_event": "STRAIGHT"
+    },
+    {
+      "name": "VEHICLE_SPEED_LIKE",
+      "kind": "opposed_continuous",
+      "positive_event": "ACCEL_LIGHT",
+      "negative_event": "DECEL_LIGHT",
+      "baseline_event": "STEADY_SPEED"
+    },
+    {
+      "name": "LEAD_RANGE_LIKE",
+      "kind": "opposed_continuous",
+      "positive_event": "LEAD_OPENING",
+      "negative_event": "LEAD_CLOSING",
+      "baseline_event": "LEAD_STEADY"
+    },
+    {
+      "name": "ACC_GAP_CONTROL_LIKE",
+      "kind": "opposed_continuous",
+      "positive_event": "GAP_UP",
+      "negative_event": "GAP_DOWN",
+      "baseline_event": null
+    },
+    {
+      "name": "BLINDSPOT_LEFT_STATE_LIKE",
+      "kind": "toggle",
+      "positive_event": "BLIND_LEFT_ENTER",
+      "negative_event": "BLIND_LEFT_EXIT",
+      "baseline_event": null
+    },
+    {
+      "name": "BLINDSPOT_RIGHT_STATE_LIKE",
+      "kind": "toggle",
+      "positive_event": "BLIND_RIGHT_ENTER",
+      "negative_event": "BLIND_RIGHT_EXIT",
+      "baseline_event": null
+    },
+    {
+      "name": "BRAKE_STATE_LIKE",
+      "kind": "toggle",
+      "positive_event": "BRAKE_PRESS",
+      "negative_event": "BRAKE_RELEASE",
+      "baseline_event": null
+    },
+    {
+      "name": "ACC_ACTIVE_STATE_LIKE",
+      "kind": "toggle",
+      "positive_event": "ACC_ON",
+      "negative_event": "ACC_OFF",
+      "baseline_event": null
+    }
+  ]
+}
