@@ -45,6 +45,18 @@ class Observation:
 
 
 @dataclass(frozen=True)
+class TrafficControlInput:
+    """Small compatibility input for composed synthetic scenarios."""
+
+    kind: str
+    state: str
+    lane_id: str | None
+    confidence: float
+    stale: bool = False
+    speed_limit_kph: int | None = None
+
+
+@dataclass(frozen=True)
 class TrafficControlConstraint:
     lane_id: str | None
     must_stop: bool = False
@@ -55,7 +67,41 @@ class TrafficControlConstraint:
     reason: str = "NONE"
 
 
-def evaluate(obs: Observation, min_confidence: float = 0.80) -> TrafficControlConstraint:
+TrafficControlDecision = TrafficControlConstraint
+
+
+def _normalize_compatibility_input(obs: TrafficControlInput) -> Observation:
+    if obs.kind == "RED_X":
+        lane_state = LaneControlState.CLOSED if obs.state == "ACTIVE" else LaneControlState.UNKNOWN
+        return Observation(
+            timestamp_ns=0,
+            kind=SignalKind.LANE_CONTROL,
+            confidence=obs.confidence,
+            lane_id=obs.lane_id,
+            lane_control=lane_state,
+            stale=obs.stale,
+        )
+    if obs.kind == "VARIABLE_SPEED":
+        return Observation(
+            timestamp_ns=0,
+            kind=SignalKind.VARIABLE_SPEED,
+            confidence=obs.confidence,
+            lane_id=obs.lane_id,
+            speed_limit_kph=obs.speed_limit_kph,
+            stale=obs.stale,
+        )
+    return Observation(
+        timestamp_ns=0,
+        kind=SignalKind.WARNING,
+        confidence=obs.confidence,
+        lane_id=obs.lane_id,
+        stale=obs.stale,
+    )
+
+
+def evaluate(obs: Observation | TrafficControlInput, min_confidence: float = 0.80) -> TrafficControlConstraint:
+    if isinstance(obs, TrafficControlInput):
+        obs = _normalize_compatibility_input(obs)
     if obs.stale or obs.confidence < min_confidence:
         return TrafficControlConstraint(obs.lane_id, uncertain=True, reason="STALE_OR_LOW_CONFIDENCE")
 

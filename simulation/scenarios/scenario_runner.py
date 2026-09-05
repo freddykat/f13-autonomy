@@ -40,6 +40,12 @@ class ScenarioResult:
     shadow: ShadowDecision
     disagreement: DisagreementEvent
 
+    @property
+    def shadow_decision(self) -> ShadowDecision:
+        """Backward-compatible name used by the M0 exam runner."""
+
+        return self.shadow
+
 
 def run_scenario(s: Scenario) -> ScenarioResult:
     traffic = evaluate(s.traffic_control) if s.traffic_control is not None else None

@@ -72,5 +72,5 @@ def preference_score(profile: DriverPreferenceProfile, action: str) -> float:
     if action == "RIGHT":
         return profile.return_right_bias
     if action == "KEEP":
-        return 1.0 - profile.overtake_bias
+        return round(1.0 - profile.overtake_bias, 12)
     return 0.0

@@ -113,7 +113,8 @@ def validate_signal(
         return report
 
     disagreements = [abs(a - b) for i, a in enumerate(values) for b in values[i + 1 :]]
-    report.max_pairwise_disagreement = max(disagreements) if disagreements else 0.0
+    # Normalize binary floating-point noise at the evidence/report boundary.
+    report.max_pairwise_disagreement = round(max(disagreements), 12) if disagreements else 0.0
 
     if len(values) < policy.min_sources_for_agreement:
         report.agreement = "INSUFFICIENT_SOURCES"
