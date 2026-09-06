@@ -1,0 +1,117 @@
+# comma/openpilot Outreach Drafts
+
+Status: prepared, not sent.
+
+## 1. Discord / car-port introduction
+
+Hi — we are working on a read-only BMW F13/F-series openpilot research port.
+
+The main technical blocker is the BMW CAN/FlexRay boundary. Instead of assuming the car needs a generic FlexRay bridge, we built passive tooling that preserves CAN/FlexRay provenance and ranks which functions appear on CAN, FlexRay, or both.
+
+Current repo work includes:
+
+- transport-aware CAN/FlexRay frame model;
+- event-driven function identification;
+- cross-session evidence;
+- FRR range/velocity and track hypotheses;
+- CAN↔FlexRay temporal correspondence;
+- request↔feedback topology inference;
+- a minimal Comma Four Beta 1 plan with no BMW actuation.
+
+We will have the actual 2012 F13 available for synchronized validation in December 2026.
+
+Before we build a BMW-specific upstream-shaped adapter, we would appreciate guidance on two narrow questions:
+
+1. Once real signals are validated, would a dashcam-only/read-only BMW `opendbc/car/bmw` scaffold be a useful first upstream contribution?
+2. For genuinely FlexRay-only observations, would you prefer the transport to remain external and normalize into existing vehicle interfaces, or is there interest in a generic transport abstraction if the implementation is small and independently useful?
+
+We are intentionally not proposing steering/brake control until replay/HIL/closed-course evidence exists.
+
+Repo: https://github.com/freddykat/f13-autonomy
+
+## 2. Short GitHub discussion/issue-style version
+
+### BMW F-series read-only port research / FlexRay boundary
+
+We are preparing an evidence-first BMW F-series openpilot port around a Comma Four.
+
+BMW is currently outside upstream support and the official compatibility docs call out FlexRay as a blocker. Our current work is therefore focused on determining, function by function, whether useful F13 state is:
+
+- visible through CAN/ZGW;
+- FlexRay-only;
+- represented on both transports;
+- or unresolved.
+
+We have implemented offline/read-only tools for transport-aware signal discovery, cross-session evidence, CAN↔FlexRay correspondence and request↔feedback topology.
+
+No BMW control path exists.
+
+We expect real F13 captures in December 2026. We would like upstream guidance on the preferred shape of a future read-only BMW brand scaffold and, separately, whether generic FlexRay observation support would be useful upstream if kept small and transport-focused.
+
+## 3. COMMA_HACK 7 application idea
+
+Project title:
+
+**BMW/FlexRay Shadow Port for Comma Four**
+
+One-line pitch:
+
+Build a transport-aware, read-only BMW F-series shadow port that lets a Comma Four consume validated BMW state without pretending FlexRay is CAN.
+
+Demo target:
+
+```text
+Comma Four openpilot replay
++
+BMW CAN/FlexRay recorded or synthetic transport
++
+automatic function identification
++
+BMWVehicleState / CarState shadow adapter
++
+CAN↔FlexRay correspondence
++
+BMWControlIntent SHADOW
+```
+
+Why useful:
+
+BMW, Mercedes, Audi, Land Rover and some Volvo platforms are currently outside normal openpilot support partly because of FlexRay. The project explores whether useful state can remain CAN-first while adding FlexRay only where evidence proves it is required.
+
+Safety boundary:
+
+No steering, brake, throttle, gear or FlexRay TX.
+
+## 4. Later private engineering outreach
+
+Use only after real BMW evidence exists.
+
+Subject concept:
+
+**BMW F-series openpilot/FlexRay research — validated read-only port evidence**
+
+Body concept:
+
+We have completed synchronized real-car BMW F13 CAN/FlexRay observation and can provide reproducible evidence for core CarState fields, ACC/SWW observations and the CAN-vs-FlexRay transport boundary.
+
+Rather than asking comma to support the vehicle directly, we would like feedback on a small upstream contribution path. We can keep the first BMW port dashcam-only/read-only and split generic transport work from BMW-specific decoders.
+
+The useful artifacts are:
+- exact vehicle/ECU provenance;
+- repeated signal evidence;
+- replayable captures;
+- unit-tested decoders;
+- transport correspondence;
+- explicit UNKNOWN/stale handling.
+
+If this aligns with openpilot priorities, we would be happy to reshape the work into small reviewable PRs.
+
+## Rules before sending
+
+- link only green-CI main or a focused PR;
+- do not claim BMW support exists;
+- do not lead with Tesla HW4, parking, LiDAR or full autonomy;
+- do not ask comma to validate public-road actuation;
+- ask one narrow technical question at a time;
+- keep initial outreach short;
+- offer evidence and code rather than architecture slides.
