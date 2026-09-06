@@ -23,8 +23,8 @@ Do not present the project as if it were led by professional autonomous-driving 
 
 The accurate description is:
 
-- enthusiast-led;
-- strong practical automotive, electrical/electronic, diagnostics and hardware-integration background;
+- BMW F13/F-series enthusiast-led;
+- strong practical BMW F13/F-series, automotive electrical/electronic, diagnostics and hardware-integration background;
 - basic programming ability;
 - substantial AI-assisted research, implementation, tests and documentation;
 - strong system-level ideas and practical vehicle understanding;
