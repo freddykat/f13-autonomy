@@ -1,0 +1,60 @@
+{
+  "mode": "SAS_IN_THE_LOOP_RESEARCH",
+  "live_f13_actuation": false,
+  "direct_gseries_to_f13_forwarding": false,
+  "security_bypass": false,
+  "levels": [
+    {
+      "level": "L0_STATIC_TEACHER",
+      "powered_ecu_required": false,
+      "allowed": ["FIRMWARE_ANALYSIS", "CODING_METADATA", "DIAGNOSTIC_METADATA", "PUBLIC_TECHNICAL_DOCS"]
+    },
+    {
+      "level": "L1_POWERED_SAS_BENCH",
+      "powered_ecu_required": true,
+      "allowed": ["ECU_IDENTIFICATION", "PASSIVE_NETWORK_OBSERVATION", "READ_ONLY_DIAGNOSTICS"]
+    },
+    {
+      "level": "L2_VIRTUAL_VEHICLE_CONTEXT",
+      "powered_ecu_required": true,
+      "allowed": ["BENIGN_STATE_REPLAY", "BENCH_CONTEXT_EMULATION", "DEPENDENCY_DISCOVERY"],
+      "possible_dependency_classes": [
+        "WAKE_NETWORK_STATE",
+        "VEHICLE_SPEED",
+        "WHEEL_SPEED",
+        "STEERING_ANGLE",
+        "YAW",
+        "GEAR",
+        "BRAKE_ACCELERATOR_STATE",
+        "KAFAS_LIKE_OBSERVATIONS",
+        "ACC_RADAR_LIKE_OBSERVATIONS",
+        "VALIDITY_HEALTH_STATE",
+        "GATEWAY_VISIBLE_TOPOLOGY"
+      ]
+    },
+    {
+      "level": "L3_SAS_SHADOW_BEHAVIOR",
+      "powered_ecu_required": true,
+      "allowed": ["SYNTHETIC_SCENARIOS", "PASSIVE_OUTPUT_CAPTURE", "STATE_MACHINE_OBSERVATION"]
+    },
+    {
+      "level": "L4_CROSS_GENERATION_SEMANTIC_COMPARISON",
+      "powered_ecu_required": false,
+      "allowed": ["SEMANTIC_TEMPLATE_MATCHING", "F13_HYPOTHESIS_RANKING", "OFFLINE_COMPARISON"]
+    }
+  ],
+  "forbidden": [
+    "DIRECT_SAS_TO_F13_COMMAND_FORWARDING",
+    "LIVE_F13_EPS_ACTUATION",
+    "LIVE_F13_DSC_ACTUATION",
+    "LIVE_F13_DME_ACTUATION",
+    "LIVE_F13_GEAR_ACTUATION",
+    "SECURE_BOOT_BYPASS",
+    "HSM_BYPASS",
+    "ANTI_THEFT_BYPASS",
+    "VEHICLE_IDENTITY_CLONING_FOR_ACCESS",
+    "GENERIC_GSERIES_TO_FSERIES_COMMAND_TRANSLATION"
+  ],
+  "teacher_role": "SEMANTIC_REFERENCE_AND_SHADOW_VALIDATOR",
+  "protocol_equivalence_claim": false
+}
