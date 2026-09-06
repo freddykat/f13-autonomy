@@ -1,0 +1,89 @@
+{
+  "status": "PRE_VEHICLE_PLANNING",
+  "target_experience": "EARLY_FSD_BETA_V8_V9_ERA_FEATURE_ENVELOPE_AS_AMBITION_NOT_VALIDATION_CLAIM",
+  "families": [
+    {
+      "chassis": ["F20", "F21", "F22", "F23"],
+      "group": "1_2_SERIES",
+      "priority": "HIGH",
+      "observation_reuse": "HIGH",
+      "control_reuse": "VARIANT_SPECIFIC",
+      "steering_note": "FACTORY_EPS_COMMON_VERIFY_PER_VARIANT",
+      "reason": "F30-era electronics, enthusiast base, accessible donor/test vehicles"
+    },
+    {
+      "chassis": ["F30", "F31", "F34", "F32", "F33", "F36"],
+      "group": "3_4_SERIES",
+      "priority": "VERY_HIGH",
+      "observation_reuse": "HIGH",
+      "control_reuse": "VARIANT_SPECIFIC",
+      "steering_note": "EPS_ARCHITECTURE_DOCUMENTED_VERIFY_PER_VARIANT",
+      "reason": "large platform family with ICM/DSC/KAFAS/PMA/FlexRay architecture"
+    },
+    {
+      "chassis": ["F10", "F11"],
+      "group": "5_SERIES",
+      "priority": "VERY_HIGH",
+      "observation_reuse": "VERY_HIGH",
+      "control_reuse": "DRIVETRAIN_DEPENDENT",
+      "steering_note": "RWD_EPS_XDRIVE_HYDRAULIC_IN_DOCUMENTED_F10_GENERATION",
+      "reason": "close architectural relation to F12/F13 and easier RWD EPS research target"
+    },
+    {
+      "chassis": ["F06", "F12", "F13"],
+      "group": "6_SERIES",
+      "priority": "CORE",
+      "observation_reuse": "VERY_HIGH",
+      "control_reuse": "DRIVETRAIN_BUILD_OPTION_DEPENDENT",
+      "steering_note": "XDRIVE_HYDRAULIC_IN_DOCUMENTED_F12_F13_GENERATION",
+      "reason": "prototype family"
+    },
+    {
+      "chassis": ["F01", "F02"],
+      "group": "7_SERIES",
+      "priority": "MEDIUM",
+      "observation_reuse": "HIGH",
+      "control_reuse": "COMPLEX_VARIANT_SPECIFIC",
+      "steering_note": "EPS_OR_HYDRAULIC_AND_IAS_VARIANTS_EXIST",
+      "reason": "rich premium ADAS/chassis architecture but more steering variants"
+    },
+    {
+      "chassis": ["F25", "F26"],
+      "group": "X3_X4",
+      "priority": "MEDIUM",
+      "observation_reuse": "MEDIUM_HIGH",
+      "control_reuse": "VARIANT_SPECIFIC",
+      "steering_note": "VERIFY_PER_BUILD_AND_DRIVETRAIN",
+      "reason": "valuable expansion family after sedan/coupe ports"
+    },
+    {
+      "chassis": ["F15", "F16"],
+      "group": "X5_X6",
+      "priority": "LATER",
+      "observation_reuse": "MEDIUM_HIGH",
+      "control_reuse": "COMPLEX_VARIANT_SPECIFIC",
+      "steering_note": "VERIFY_PER_BUILD_AND_DRIVETRAIN",
+      "reason": "premium owner base but xDrive/chassis complexity makes it a later control target"
+    }
+  ],
+  "compatibility_keys_required": [
+    "build_date",
+    "drivetrain",
+    "rwd_or_xdrive",
+    "steering_type",
+    "eps_active_steering_ias",
+    "icm_generation",
+    "dsc_generation",
+    "kafas_generation",
+    "frr_radar_type",
+    "sww_hc2_type",
+    "parking_pma_variant",
+    "gateway_generation",
+    "observed_can_paths",
+    "observed_flexray_paths",
+    "validated_carstate_fields",
+    "validated_radar_fields",
+    "control_stage"
+  ],
+  "global_control_claim": false
+}
