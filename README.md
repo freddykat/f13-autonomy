@@ -35,6 +35,14 @@ We do **not** want AI-generated code to be mistaken for independently expert-aut
 
 We actively want experienced openpilot/comma, embedded, BMW CAN/FlexRay and safety developers to challenge assumptions, review code and help reshape anything that does not meet upstream engineering standards.
 
+## Why this matters
+
+The BMW F13 and related F-series cars are still high-value, capable luxury platforms with sophisticated chassis, powertrain and comfort systems, but their driver-assistance technology reflects the early 2010s rather than 2026.
+
+There is a real owner segment that does not want to replace a well-built, expensive car simply to gain modern driver-assistance, perception and software features. The long-term idea is to explore whether these cars can gain carefully integrated, reversible and safety-reviewed modern technology while preserving their OEM character.
+
+This project is therefore not only about one 2012 650i. It is also an exploration of how mature premium vehicles could remain technologically relevant for owners who value the car itself.
+
 ## Core idea
 
 ```text
