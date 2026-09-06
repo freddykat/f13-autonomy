@@ -29,6 +29,71 @@ Public BMW technical material indicates that SAS:
 
 This makes it a strong candidate for an isolated “virtual vehicle around SAS” experiment.
 
+## Intended role: ADAS domain coordinator
+
+The SAS should be thought of as the **central ADAS coordinator above the perception ECUs**, not as a replacement for KAFAS.
+
+In a modern BMW-style architecture:
+
+```text
+KAFAS / front camera ─┐
+ACC/front radar ──────┤
+side radars ──────────┤
+parking/PDC ──────────┤
+ICM/DSC/EPS state ────┤
+gear/driver inputs ───┤
+                      ▼
+                     SAS
+                      │
+            unified ADAS state / requests
+                      │
+             chassis / body domains
+```
+
+For the F13 concept, the equivalent long-term research architecture is:
+
+```text
+KAFAS2 retrofit ──────┐
+OEM FRR radar ────────┤
+OEM SWW/HC2 radars ───┤
+Parking High / PDC ───┤
+ICM / DSC / IAS ──────┤
+BMWVehicleState ──────┤
+                      ▼
+        F-series compatibility layer
+                      │
+                      ▼
+                SAS teacher/shadow
+                      │
+             semantic ADAS state
+                      │
+            Comma/openpilot comparison
+```
+
+The compatibility layer is essential because F-series modules cannot be assumed to publish the exact G-series protocol expected by SAS.
+
+Therefore the hypothesis is not:
+
+```text
+F13 KAFAS → SAS → F13 actuators
+```
+
+but initially:
+
+```text
+F13 OEM systems
+      ↓
+semantic normalization
+      ↓
+SAS-compatible virtual context
+      ↓
+SAS shadow behavior
+      ↓
+compare with openpilot / human / F13 response
+```
+
+If later HIL evidence shows that some BMW semantics are truly compatible across generations, that compatibility must still be validated per signal and per actuator domain.
+
 ## Architecture
 
 ```text
@@ -224,6 +289,10 @@ If the SAS can be made operational in a virtual G-series environment, we get a B
 Then the F13 adapter can be written against **BMW semantics**, not guessed byte patterns.
 
 ## Possible final architecture if the research succeeds
+
+The strongest architectural role for SAS is as a central BMW-ADAS semantic coordinator and validator that can consume normalized states from the F13 OEM sensor ecosystem.
+
+It should not replace KAFAS, FRR, SWW, PDC or ICM/DSC. Those remain the physical/OEM sources.
 
 The most ambitious safe architecture would still keep the modern SAS outside direct F13 actuation:
 
