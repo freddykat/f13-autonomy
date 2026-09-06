@@ -17,6 +17,37 @@ That makes this project potentially useful if it can reduce the unknowns around:
 
 The project should approach comma as a technical contributor first, not as a generic commercial partnership request.
 
+## Transparency about team capability
+
+Do not present the project as if it were led by professional autonomous-driving software engineers.
+
+The accurate description is:
+
+- enthusiast-led;
+- strong practical automotive, electrical/electronic, diagnostics and hardware-integration background;
+- basic programming ability;
+- substantial AI-assisted research, implementation, tests and documentation;
+- strong system-level ideas and practical vehicle understanding;
+- limited ability to independently implement or fully audit advanced openpilot, embedded-safety, ML or low-level real-time code without expert review.
+
+This should be stated early enough that nobody reviewing the repository has to infer it later.
+
+The goal is not to apologize for using AI. The goal is to make the development model clear:
+
+```text
+practical vehicle knowledge + system ideas
+                +
+AI-assisted implementation
+                +
+tests/replay
+                +
+experienced external review
+                ↓
+       progressively trustworthy work
+```
+
+Passing CI is evidence that the code satisfies the tests, not evidence that the authors possess professional safety-software expertise or that the implementation is safe for vehicle actuation.
+
 ## comma's preferred collaboration style
 
 Current comma/openpilot public guidance strongly favors:
@@ -43,7 +74,7 @@ Before asking for engineering attention, maintain:
 - no unvalidated BMW decoder claims;
 - no live actuation code.
 
-Goal: a comma/openpilot engineer should understand the useful part of the project in five minutes.
+Goal: a comma/openpilot engineer should understand the useful part of the project in five minutes, including who built it, where AI was used and where expert review is still required.
 
 ### Stage 2 — Discord introduction
 
@@ -202,6 +233,7 @@ This is optional; the project does not depend on attending.
 Good requests:
 
 - architectural feedback;
+- review/correction of AI-assisted code where it could become upstream-quality;
 - acceptable upstream boundaries;
 - review of a small generic PR;
 - advice on brand-port structure;
@@ -219,7 +251,9 @@ Poor first requests:
 
 ## What we can offer comma/openpilot
 
-If executed well:
+If executed well, our value is not claiming software expertise we do not have. It is combining practical vehicle access and integration knowledge with transparent, testable, AI-assisted engineering work.
+
+Potential value:
 
 1. a documented BMW F-series observation corpus;
 2. CAN/FlexRay transport-availability evidence;
