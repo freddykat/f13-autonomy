@@ -1,0 +1,99 @@
+{
+  "vehicle": "BMW F13 Prototype 001",
+  "mode": "SHADOW_HIL_RESEARCH_ONLY",
+  "live_transmit": false,
+  "auto_promote": false,
+  "domains": [
+    {
+      "domain": "LATERAL_STEERING",
+      "current_stage": "SHADOW",
+      "planner_input": ["targetCurvature", "targetCurvatureRate"],
+      "preferred_initial_strategy": "DISCOVER_EXISTING_BMW_ACTUATOR_PATH_BEFORE_RETROFIT_COMMANDING",
+      "candidate_bmw_components": ["ICM", "EPS_or_ActiveSteering", "IAS_if_equipped"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["steeringWheelAngle", "frontSteerAngle", "steeringTorque", "yawRate", "epsState", "icmState", "rearSteerAngle_if_equipped"],
+      "driver_override": ["steeringTorque"],
+      "research_events": ["STEER_LEFT_SLOW", "STEER_RIGHT_SLOW", "STEER_CENTER", "CURVE_LEFT", "CURVE_RIGHT", "STRAIGHT"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "LONGITUDINAL",
+      "current_stage": "SHADOW",
+      "planner_input": ["targetSpeed", "targetAcceleration", "targetJerk", "stopRequest", "resumeRequest"],
+      "preferred_initial_strategy": "OEM_ACC_ORCHESTRATION_FIRST",
+      "candidate_bmw_components": ["FRR", "ICM", "DSC", "DME"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["vehicleSpeed", "wheelSpeeds", "longitudinalAcceleration", "brakePedalPressed", "acceleratorPosition", "dscState", "accState"],
+      "driver_override": ["brakePedalPressed", "acceleratorPosition"],
+      "research_events": ["ACC_ON", "ACC_OFF", "GAP_UP", "GAP_DOWN", "SET_UP", "SET_DOWN", "BRAKE_PRESS", "BRAKE_RELEASE", "ACCEL_LIGHT", "DECEL_LIGHT"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "INDICATORS",
+      "current_stage": "SHADOW",
+      "planner_input": ["indicatorIntent"],
+      "preferred_initial_strategy": "DISCOVER_REQUEST_AND_FEEDBACK_SEPARATELY",
+      "candidate_bmw_components": ["SZL", "FRM_or_body_controller"],
+      "candidate_transports": ["CAN", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["indicatorLeftState", "indicatorRightState", "hazardState"],
+      "driver_override": ["turnSignalCommand"],
+      "research_events": ["INDICATOR_LEFT_ON", "INDICATOR_LEFT_OFF", "INDICATOR_RIGHT_ON", "INDICATOR_RIGHT_OFF", "HAZARD_ON", "HAZARD_OFF"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "PARKING_STEERING",
+      "current_stage": "SHADOW",
+      "planner_input": ["targetPose", "targetCurvature", "targetSpeed"],
+      "preferred_initial_strategy": "REUSE_VALIDATED_LATERAL_ACTUATOR_PATH",
+      "candidate_bmw_components": ["EPS_or_ActiveSteering", "ICM", "ParkingHigh"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["steeringWheelAngle", "frontSteerAngle", "wheelSpeeds", "pdcState", "scene3dState", "gear"],
+      "driver_override": ["steeringTorque", "brakePedalPressed"],
+      "research_events": ["PARK_STEER_LEFT", "PARK_STEER_RIGHT", "PARK_STRAIGHT"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "PARKING_LONGITUDINAL",
+      "current_stage": "SHADOW",
+      "planner_input": ["targetSpeed", "stopDistance", "holdRequest"],
+      "preferred_initial_strategy": "LOW_SPEED_OEM_BRAKE_POWERTRAIN_PATH_IF_AVAILABLE",
+      "candidate_bmw_components": ["DSC", "DME", "ParkingHigh"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["vehicleSpeed", "wheelSpeeds", "brakeState", "longitudinalAcceleration", "obstacleDistance", "gear"],
+      "driver_override": ["brakePedalPressed", "acceleratorPosition"],
+      "research_events": ["PARK_CREEP_FORWARD", "PARK_CREEP_REVERSE", "PARK_STOP"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "GEAR_SELECTION",
+      "current_stage": "DISABLED",
+      "planner_input": ["gearIntent"],
+      "preferred_initial_strategy": "OBSERVE_ONLY_UNTIL_LATE_STAGE_HIL",
+      "candidate_bmw_components": ["GWS2", "EGS"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["gear", "gearSelectorState", "vehicleSpeed", "brakePedalPressed"],
+      "driver_override": ["gearSelectorState", "brakePedalPressed"],
+      "research_events": ["GEAR_P", "GEAR_R", "GEAR_N", "GEAR_D"],
+      "tx_allowed": false
+    },
+    {
+      "domain": "BRAKE_HOLD",
+      "current_stage": "DISABLED",
+      "planner_input": ["holdRequested", "releaseRequested"],
+      "preferred_initial_strategy": "OBSERVE_DSC_PARKING_BRAKE_BEHAVIOR_FIRST",
+      "candidate_bmw_components": ["DSC", "parking_brake_controller"],
+      "candidate_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+      "transport_confirmed": false,
+      "required_feedback": ["vehicleSpeed", "wheelSpeeds", "brakeState", "parkingBrakeState"],
+      "driver_override": ["brakePedalPressed", "parkingBrakeInput"],
+      "research_events": ["BRAKE_HOLD_ON", "BRAKE_HOLD_OFF"],
+      "tx_allowed": false
+    }
+  ]
+}
