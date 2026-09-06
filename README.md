@@ -6,11 +6,17 @@ Experimental BMW F13 integration built around a reproducible upstream openpilot 
 
 ## Project status
 
-Research, architecture and hardware-planning phase. The first executable target is **openpilot 0.11.2 on comma hardware in shadow/no-output mode**. Supervised motorway/highway autonomy remains the later vehicle target; development begins with logging, replay, shadow mode and hardware-in-the-loop before experimental actuation.
+**Pre-vehicle BMW integration / Beta 1 shadow preparation.** The current published upstream openpilot release is **v0.11.1**. Prototype 001 pins the reviewed official `zeroeleventwo` development-branch commit `044640668aa25d5c72f948ec072bfc259d1b269a` for reproducible shadow work; it is not described as a published v0.11.2 tag unless upstream publishes that tag.
+
+The repository now contains transport-aware CAN/FlexRay passive discovery, cross-session evidence, FRR track hypotheses, CAN↔FlexRay correspondence, request/feedback topology analysis, a shadow-only BMW control-intent architecture, and explicit Beta 1 hardware/software policies.
+
+The first real-car objective is **F13 Observation Run 001 in December 2026**. Supervised motorway/highway autonomy remains a later target after replay, HIL and closed-course validation.
+
+See `docs/PROJECT_STATUS_2026-09-06.md` for the current implementation state.
 
 ## Executable baseline
 
-The upstream base is locked in `upstream/openpilot.lock.json` rather than following a moving branch. The current baseline is openpilot `0.11.2` at commit `044640668aa25d5c72f948ec072bfc259d1b269a`, including its exact `opendbc` and Panda submodule commits.
+The upstream base is locked in `upstream/openpilot.lock.json` rather than following a moving branch. The current shadow baseline is the official `zeroeleventwo` branch commit `044640668aa25d5c72f948ec072bfc259d1b269a`, including its exact `opendbc` and Panda submodule commits.
 
 ```bash
 python tools/openpilot_workspace.py validate
@@ -326,15 +332,15 @@ A BMW F13 retaining OEM/manual driving while gaining a modular path toward Parti
 
 ## Current priorities
 
-- map BMW CAN/FlexRay architecture
-- identify the EPS retrofit/integration strategy
-- prototype openpilot on custom compute
-- design the synchronized camera system
-- build CAN/FlexRay logging
-- contact Tesla HW4 developers
-- investigate minimum viable HW4/FSD bench
-- build the Shadow Lab software
-- create the disagreement-review dashboard
+- prepare December F13 Observation Run 001
+- validate BMW CAN/ZGW/OBD visibility before assuming FlexRay is required
+- add passive FlexRay RX only for missing/ambiguous functions
+- validate core BMW ego-state signals for a read-only `CarState`
+- validate FRR/SWW evidence for later `RadarData` / blind-spot adapters
+- characterize steering and longitudinal request↔feedback topology without TX
+- keep Comma Four as the Beta 1 openpilot/front-perception baseline
+- engage the openpilot/comma community with small, reviewable technical contributions
+- defer KAFAS2, surround/LiDAR, eGPU and actuation hardware until measured blockers justify them
 
 ## Contributions
 
