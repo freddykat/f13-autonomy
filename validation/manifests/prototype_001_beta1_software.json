@@ -1,0 +1,99 @@
+{
+  "vehicle": "BMW F13 Prototype 001",
+  "phase": "BETA1_SHADOW_SOFTWARE",
+  "goal": "COMMA_FOUR_PLUS_BMW_READ_ONLY_PORT",
+  "components": [
+    {
+      "name": "locked_openpilot_baseline",
+      "required": true,
+      "write_capable": false
+    },
+    {
+      "name": "bmw_transport_ingest",
+      "required": true,
+      "write_capable": false,
+      "transports": ["CAN", "FLEXRAY_CONDITIONAL"]
+    },
+    {
+      "name": "bmw_core_ego_decoders",
+      "required": true,
+      "write_capable": false,
+      "minimum_signals": [
+        "vehicleSpeed",
+        "steeringState",
+        "yawRate",
+        "longitudinalAcceleration",
+        "lateralAcceleration",
+        "brakePedalPressed",
+        "acceleratorPosition",
+        "gear",
+        "dscState",
+        "icmState",
+        "epsState"
+      ]
+    },
+    {
+      "name": "bmw_vehicle_state",
+      "required": true,
+      "write_capable": false
+    },
+    {
+      "name": "bmw_carstate",
+      "required": true,
+      "write_capable": false
+    },
+    {
+      "name": "bmw_interface",
+      "required": true,
+      "write_capable": false,
+      "dashcamOnly": true
+    },
+    {
+      "name": "bmw_acc_radar",
+      "required": false,
+      "condition": "VALIDATED_FRR_TRACK_OR_SELECTED_LEAD_EVIDENCE",
+      "write_capable": false
+    },
+    {
+      "name": "bmw_blindspot",
+      "required": false,
+      "condition": "VALIDATED_SWW_HC2_EVIDENCE",
+      "write_capable": false
+    },
+    {
+      "name": "bmw_control_intent_shadow",
+      "required": true,
+      "write_capable": false,
+      "authority": "SHADOW"
+    },
+    {
+      "name": "deterministic_replay",
+      "required": true,
+      "write_capable": false
+    }
+  ],
+  "forbidden": [
+    "BMW_CARCONTROLLER",
+    "SENDCAN",
+    "CAN_TX_ENCODER",
+    "FLEXRAY_TX_ENCODER",
+    "DIAGNOSTIC_WRITE",
+    "EPS_ACTUATION",
+    "DSC_ACTUATION",
+    "DME_ACTUATION",
+    "GEAR_ACTUATION",
+    "PARKING_ACTUATION"
+  ],
+  "acceptance": [
+    "SYNCHRONIZED_COMMA_MODEL_OUTPUT",
+    "VALIDATED_BMW_EGO_STATE",
+    "TRANSPORT_PROVENANCE",
+    "OPENPILOT_CARSTATE_READ_ONLY",
+    "OPENPILOT_SHADOW_PROPOSAL",
+    "BMW_CONTROL_INTENT_SHADOW",
+    "HUMAN_ACTION",
+    "MEASURED_BMW_RESPONSE",
+    "DETERMINISTIC_REPLAY",
+    "NO_ACTUATION_PATH"
+  ]
+}
