@@ -8,6 +8,8 @@ Hi — we are working on a read-only BMW F13/F-series openpilot research port.
 
 A quick transparency note: we are BMW F13/F-series enthusiasts rather than professional autonomous-driving software engineers. Our stronger background is practical BMW F13/F-series work, electrical/electronic systems, diagnostics, hardware integration and basic programming. We use AI extensively for research, code generation, tests and documentation, and we are specifically looking for experienced developers to challenge and review the software side rather than pretending we can independently validate every low-level implementation detail.
 
+The broader motivation is that the F13/F-series remains a high-value luxury platform, but its ADAS stack is now more than a decade behind current vehicles. We are interested in whether owners can keep these cars and add carefully integrated 2026-era driver-assistance technology instead of replacing the vehicle purely for software features.
+
 The main technical blocker is the BMW CAN/FlexRay boundary. Instead of assuming the car needs a generic FlexRay bridge, we built passive tooling that preserves CAN/FlexRay provenance and ranks which functions appear on CAN, FlexRay, or both.
 
 Current repo work includes:
@@ -82,7 +84,7 @@ BMWControlIntent SHADOW
 
 Why useful:
 
-BMW, Mercedes, Audi, Land Rover and some Volvo platforms are currently outside normal openpilot support partly because of FlexRay. The project explores whether useful state can remain CAN-first while adding FlexRay only where evidence proves it is required.
+There is a large class of high-value premium vehicles whose mechanical/chassis quality remains excellent while their ADAS/software stack is outdated. BMW, Mercedes, Audi, Land Rover and some Volvo platforms are also currently outside normal openpilot support partly because of FlexRay. The project explores whether useful state can remain CAN-first while adding FlexRay only where evidence proves it is required.
 
 Safety boundary:
 
@@ -144,3 +146,17 @@ The value we bring should be framed as:
 - system-level ideas and test scenarios;
 - willingness to document everything openly;
 - willingness to accept technical correction and reshape code for upstream standards.
+
+
+## Owner / market motivation
+
+A useful way to explain the end-user motivation without overselling it:
+
+> Many BMW F13/F-series owners are maintaining cars that were expensive, technically sophisticated luxury vehicles and are still desirable today. What dates them most is often not the chassis or powertrain, but the software and driver-assistance stack. We want to explore a path for those owners to gain modern, 2026-era supervised driver-assistance and perception features while keeping the original car and preserving OEM/manual operation.
+
+Avoid framing this as "expensive-car owners deserve special treatment." The stronger framing is:
+- preserve valuable existing vehicles;
+- extend useful life;
+- reduce technology obsolescence;
+- offer modern safety/ADAS capability without forcing vehicle replacement;
+- keep retrofits reversible and OEM-aware.
