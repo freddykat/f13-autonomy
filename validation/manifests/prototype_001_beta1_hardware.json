@@ -1,0 +1,100 @@
+{
+  "vehicle": "BMW F13 Prototype 001",
+  "phase": "BETA1_SHADOW",
+  "objective": "PROVE_COMMA_FOUR_PLUS_BMW_COMPATIBILITY_LAYER",
+  "live_actuation": false,
+  "hardware": [
+    {
+      "item": "COMMA_FOUR",
+      "priority": "REQUIRED",
+      "role": ["OPENPILOT_RUNTIME", "FRONT_VISION", "DRIVER_MONITORING", "GPS_IMU", "LOCAL_LOGGING"],
+      "beta1_blocker_if_missing": true
+    },
+    {
+      "item": "PASSIVE_CAN_LOGGER",
+      "priority": "REQUIRED",
+      "role": ["RAW_BMW_CAN_CAPTURE", "INDEPENDENT_EVIDENCE", "TIMESTAMPED_REPLAY"],
+      "beta1_blocker_if_missing": true
+    },
+    {
+      "item": "PROTECTED_POWER_AND_BREAKOUT_HARNESS",
+      "priority": "REQUIRED",
+      "role": ["SAFE_POWER", "REMOVABLE_BUS_ACCESS", "NO_LOOM_CUTTING"],
+      "beta1_blocker_if_missing": true
+    },
+    {
+      "item": "ENET_DIAGNOSTIC_ACCESS",
+      "priority": "REQUIRED",
+      "role": ["ECU_IDENTITY", "SOFTWARE_VERSION", "READ_ONLY_SEMANTIC_CORROBORATION"],
+      "beta1_blocker_if_missing": true
+    },
+    {
+      "item": "PASSIVE_FLEXRAY_RX",
+      "priority": "CONDITIONAL",
+      "activation_condition": "CAN_EVIDENCE_INSUFFICIENT_OR_AMBIGUOUS",
+      "role": ["FLEXRAY_ONLY_SIGNAL_OBSERVATION", "CAN_FLEXRAY_CORRESPONDENCE"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "INDEPENDENT_GNSS_IMU",
+      "priority": "RECOMMENDED",
+      "activation_condition": "MOTION_VALIDATION_NEEDS_INDEPENDENT_REFERENCE",
+      "role": ["YAW_VALIDATION", "ACCEL_VALIDATION", "CLOCK_CROSS_CHECK"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "KAFAS2_RETROFIT",
+      "priority": "DEFER",
+      "role": ["OEM_PERCEPTION_CORROBORATION"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "SURROUND_CAMERAS",
+      "priority": "DEFER",
+      "role": ["SCENE3D", "PARKING", "SIDE_REAR_PERCEPTION"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "LIDAR_DEPTH",
+      "priority": "DEFER",
+      "role": ["METRIC_DEPTH", "SCENE3D", "PARKING_VALIDATION"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "CHESTNUT_EGPU",
+      "priority": "DEFER",
+      "role": ["LARGE_MODEL_COMPUTE"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "TESLA_HW4_BENCHMARK_HARDWARE",
+      "priority": "DEFER",
+      "role": ["EXTERNAL_TEACHER_BENCHMARK"],
+      "beta1_blocker_if_missing": false
+    },
+    {
+      "item": "PARKING_ACTUATION_HARDWARE",
+      "priority": "DEFER",
+      "role": ["FUTURE_PARKING_CONTROL_RESEARCH"],
+      "beta1_blocker_if_missing": false
+    }
+  ],
+  "acceptance": {
+    "requires_live_steering": false,
+    "requires_live_longitudinal": false,
+    "requires_parking_control": false,
+    "requires_gear_control": false,
+    "requires_kafas2": false,
+    "requires_lidar": false,
+    "requires_surround_cameras": false,
+    "requires_external_gpu": false,
+    "requires": [
+      "SYNCHRONIZED_COMMA_AND_BMW_CAPTURE",
+      "CORE_BMW_EGO_STATE_EVIDENCE",
+      "TRANSPORT_PROVENANCE",
+      "OPENPILOT_SHADOW_PROPOSAL",
+      "BMW_CONTROL_INTENT_SHADOW",
+      "DETERMINISTIC_REPLAY"
+    ]
+  }
+}
