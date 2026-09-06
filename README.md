@@ -27,7 +27,7 @@ See `docs/OPENPILOT_BASELINE.md` for the BMW integration boundary and upgrade pr
 
 ## Background
 
-We are **enthusiasts and practical integrators, not professional autonomous-driving software engineers**. Our strongest experience is hands-on automotive work, electrical/electronic systems, mechanical integration, diagnostics and basic programming. We are comfortable understanding systems, wiring, signals, hardware constraints and integration problems, but we do not claim deep expertise in advanced software engineering, machine learning, embedded safety or openpilot internals.
+We are **BMW F13/F-series enthusiasts and practical integrators, not professional autonomous-driving software engineers**. Our strongest experience is hands-on BMW F13/F-series work, automotive electrical/electronic systems, mechanical integration, diagnostics and basic programming. We are comfortable understanding systems, wiring, signals, hardware constraints and integration problems, but we do not claim deep expertise in advanced software engineering, machine learning, embedded safety or openpilot internals.
 
 A substantial part of this repository has been developed with AI assistance. AI is used for research, code generation, explanation, documentation, tests, simulation scaffolding, log analysis and CAN/FlexRay tooling. We contribute the project direction, practical vehicle knowledge, integration requirements, test ideas and engineering judgment, while relying on AI and external technical review for areas beyond our software expertise.
 
