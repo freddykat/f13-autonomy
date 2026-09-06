@@ -27,11 +27,21 @@ See `docs/OPENPILOT_BASELINE.md` for the BMW integration boundary and upgrade pr
 
 ## Background
 
-We are **not professional autonomous-driving software developers**. Our background is practical engineering, automotive/mechanical/electrical work and hardware integration. Much of the research and architecture has been developed using AI-assisted research and development.
+We are **BMW F13/F-series enthusiasts and practical integrators, not professional autonomous-driving software engineers**. Our strongest experience is hands-on BMW F13/F-series work, automotive electrical/electronic systems, mechanical integration, diagnostics and basic programming. We are comfortable understanding systems, wiring, signals, hardware constraints and integration problems, but we do not claim deep expertise in advanced software engineering, machine learning, embedded safety or openpilot internals.
 
-We intend to use AI for code generation and explanation, documentation, log analysis, tests, simulation, CAN/FlexRay analysis assistance and model/data tooling. Safety-critical changes must still pass review, simulation, replay, HIL and controlled validation.
+A substantial part of this repository has been developed with AI assistance. AI is used for research, code generation, explanation, documentation, tests, simulation scaffolding, log analysis and CAN/FlexRay tooling. We contribute the project direction, practical vehicle knowledge, integration requirements, test ideas and engineering judgment, while relying on AI and external technical review for areas beyond our software expertise.
 
-We welcome collaboration from developers familiar with openpilot/comma/panda, Tesla HW4/DAS/FSD CAN, BMW CAN/FlexRay/ICM/DSC/EPS, computer vision, embedded safety, GPU inference and automotive cameras.
+We do **not** want AI-generated code to be mistaken for independently expert-authored safety-critical software. We may understand the intended behavior and architecture without being able to manually implement or fully audit every low-level detail ourselves. For that reason, anything safety-critical must remain reviewable, tested and staged through simulation, replay, HIL and controlled validation before physical actuation is considered.
+
+We actively want experienced openpilot/comma, embedded, BMW CAN/FlexRay and safety developers to challenge assumptions, review code and help reshape anything that does not meet upstream engineering standards.
+
+## Why this matters
+
+The BMW F13 and related F-series cars are still high-value, capable luxury platforms with sophisticated chassis, powertrain and comfort systems, but their driver-assistance technology reflects the early 2010s rather than 2026.
+
+There is a real owner segment that does not want to replace a well-built, expensive car simply to gain modern driver-assistance, perception and software features. The long-term idea is to explore whether these cars can gain carefully integrated, reversible and safety-reviewed modern technology while preserving their OEM character.
+
+This project is therefore not only about one 2012 650i. It is also an exploration of how mature premium vehicles could remain technologically relevant for owners who value the car itself.
 
 ## Core idea
 

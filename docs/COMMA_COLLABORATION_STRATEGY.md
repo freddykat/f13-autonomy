@@ -4,6 +4,20 @@ Status: outreach plan, 2026-09-06.
 
 ## Why this project is relevant to comma/openpilot
 
+### End-user motivation
+
+The F13/F-series is representative of a wider group of premium cars whose mechanical, chassis and comfort engineering remains strong while their ADAS/software stack has aged significantly.
+
+A potential long-term user base is owners of high-value older luxury cars who want current driver-assistance capability without replacing the vehicle solely to gain newer software features.
+
+This should be framed as vehicle-life extension and modernization, not entitlement:
+- preserve desirable existing cars;
+- modernize perception/ADAS;
+- retain OEM/manual behavior;
+- make upgrades modular and reversible where practical;
+- avoid replacing an otherwise excellent vehicle just because its electronics are a generation behind.
+
+
 The official openpilot supported-cars documentation currently states that supported vehicles use CAN for communication and specifically lists BMW among manufacturers using FlexRay. It also states that FlexRay vehicles may be supported in the future but that there are no immediate plans for FlexRay support.
 
 That makes this project potentially useful if it can reduce the unknowns around:
@@ -16,6 +30,37 @@ That makes this project potentially useful if it can reduce the unknowns around:
 - safe, reviewable future actuator architecture.
 
 The project should approach comma as a technical contributor first, not as a generic commercial partnership request.
+
+## Transparency about team capability
+
+Do not present the project as if it were led by professional autonomous-driving software engineers.
+
+The accurate description is:
+
+- BMW F13/F-series enthusiast-led;
+- strong practical BMW F13/F-series, automotive electrical/electronic, diagnostics and hardware-integration background;
+- basic programming ability;
+- substantial AI-assisted research, implementation, tests and documentation;
+- strong system-level ideas and practical vehicle understanding;
+- limited ability to independently implement or fully audit advanced openpilot, embedded-safety, ML or low-level real-time code without expert review.
+
+This should be stated early enough that nobody reviewing the repository has to infer it later.
+
+The goal is not to apologize for using AI. The goal is to make the development model clear:
+
+```text
+practical vehicle knowledge + system ideas
+                +
+AI-assisted implementation
+                +
+tests/replay
+                +
+experienced external review
+                ↓
+       progressively trustworthy work
+```
+
+Passing CI is evidence that the code satisfies the tests, not evidence that the authors possess professional safety-software expertise or that the implementation is safe for vehicle actuation.
 
 ## comma's preferred collaboration style
 
@@ -43,7 +88,7 @@ Before asking for engineering attention, maintain:
 - no unvalidated BMW decoder claims;
 - no live actuation code.
 
-Goal: a comma/openpilot engineer should understand the useful part of the project in five minutes.
+Goal: a comma/openpilot engineer should understand the useful part of the project in five minutes, including who built it, where AI was used and where expert review is still required.
 
 ### Stage 2 — Discord introduction
 
@@ -202,6 +247,7 @@ This is optional; the project does not depend on attending.
 Good requests:
 
 - architectural feedback;
+- review/correction of AI-assisted code where it could become upstream-quality;
 - acceptable upstream boundaries;
 - review of a small generic PR;
 - advice on brand-port structure;
@@ -219,7 +265,9 @@ Poor first requests:
 
 ## What we can offer comma/openpilot
 
-If executed well:
+If executed well, our value is not claiming software expertise we do not have. It is combining practical vehicle access and integration knowledge with transparent, testable, AI-assisted engineering work.
+
+Potential value:
 
 1. a documented BMW F-series observation corpus;
 2. CAN/FlexRay transport-availability evidence;
