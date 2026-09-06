@@ -4,6 +4,20 @@ Status: outreach plan, 2026-09-06.
 
 ## Why this project is relevant to comma/openpilot
 
+### End-user motivation
+
+The F13/F-series is representative of a wider group of premium cars whose mechanical, chassis and comfort engineering remains strong while their ADAS/software stack has aged significantly.
+
+A potential long-term user base is owners of high-value older luxury cars who want current driver-assistance capability without replacing the vehicle solely to gain newer software features.
+
+This should be framed as vehicle-life extension and modernization, not entitlement:
+- preserve desirable existing cars;
+- modernize perception/ADAS;
+- retain OEM/manual behavior;
+- make upgrades modular and reversible where practical;
+- avoid replacing an otherwise excellent vehicle just because its electronics are a generation behind.
+
+
 The official openpilot supported-cars documentation currently states that supported vehicles use CAN for communication and specifically lists BMW among manufacturers using FlexRay. It also states that FlexRay vehicles may be supported in the future but that there are no immediate plans for FlexRay support.
 
 That makes this project potentially useful if it can reduce the unknowns around:
