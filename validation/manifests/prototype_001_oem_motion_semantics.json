@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "name": "prototype_001_oem_motion_semantics",
+  "phase": "B1_1_PASSIVE_DISCOVERY",
+  "actuation_authority": "NONE",
+  "domains": {
+    "lateral": [
+      {
+        "name": "OP_PLANNED_LATERAL",
+        "role": "REFERENCE",
+        "observed_motion_source": false,
+        "write_capable": false
+      },
+      {
+        "name": "BMW_OEM_LATERAL_INTENT",
+        "role": "OEM_REQUEST_OBSERVATION",
+        "observed_motion_source": false,
+        "write_capable": false,
+        "candidate_sources": ["PMA", "ICM", "EPS"]
+      },
+      {
+        "name": "BMW_OBSERVED_LATERAL_MOTION",
+        "role": "PHYSICAL_OBSERVATION",
+        "observed_motion_source": true,
+        "write_capable": false,
+        "candidate_sources": ["BMW_YAW", "INDEPENDENT_IMU", "GNSS_POSE", "VISUAL_ODOMETRY", "FRONT_STEER", "HSR_REAR_STEER"]
+      }
+    ],
+    "longitudinal": [
+      {
+        "name": "OP_PLANNED_LONGITUDINAL",
+        "role": "REFERENCE",
+        "observed_motion_source": false,
+        "write_capable": false
+      },
+      {
+        "name": "BMW_OEM_ACC_INTENT",
+        "role": "OEM_REQUEST_OBSERVATION",
+        "observed_motion_source": false,
+        "write_capable": false,
+        "execution_owner": "BMW_OEM_ACC"
+      },
+      {
+        "name": "BMW_OBSERVED_LONGITUDINAL_MOTION",
+        "role": "PHYSICAL_OBSERVATION",
+        "observed_motion_source": true,
+        "write_capable": false
+      }
+    ]
+  },
+  "invariants": {
+    "rearSteerActuationAllowed": false,
+    "directEpsActuationAllowed": false,
+    "directDscActuationAllowed": false,
+    "directBrakeActuationAllowed": false,
+    "directThrottleActuationAllowed": false,
+    "diagnosticWriteAllowed": false,
+    "unknownMayBecomeZero": false,
+    "plannerMayProveObservedMotion": false,
+    "oemIntentMaySubstituteObservedMotion": false
+  },
+  "promotion_requirements": [
+    "KNOWN_CONTROLLER_OWNERSHIP",
+    "KNOWN_UNITS_AND_COORDINATE_FRAME",
+    "REQUEST_VS_FEEDBACK_CLASSIFIED",
+    "FRESHNESS_CHARACTERIZED",
+    "REPEATABLE_PASSIVE_CORRELATION",
+    "INDEPENDENT_PHYSICAL_CORROBORATION",
+    "DETERMINISTIC_REPLAY",
+    "NO_ACTUATION_PATH"
+  ]
+}
