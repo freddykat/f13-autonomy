@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "name": "f13_pma_sgbd_candidates_template",
+  "phase": "B1_1_PASSIVE_DISCOVERY",
+  "proprietary_data_embedded": false,
+  "diagnostic_mode": "READ_ONLY",
+  "actuation_authority": "NONE",
+  "allowed_transports": ["CAN", "FLEXRAY", "UNKNOWN"],
+  "allowed_semantic_roles": ["UNKNOWN", "STATE", "REQUEST_LIKE", "TARGET_LIKE", "ACTUAL_LIKE"],
+  "allowed_promotion_states": [
+    "UNSEEN",
+    "FRAME_OBSERVED",
+    "CORRELATED_WITH_EVENT",
+    "DIAGNOSTICALLY_CORROBORATED",
+    "CROSS_SOURCE_VALIDATED",
+    "REPLAY_STABLE",
+    "STATE_SOURCE_CANDIDATE"
+  ],
+  "required_fields": [
+    "candidate_id",
+    "vehicle_platform",
+    "controller",
+    "controller_address",
+    "sgbd_variant",
+    "job_name",
+    "result_name",
+    "argument_or_id",
+    "unit",
+    "scaling_known",
+    "semantic_role",
+    "catalog_provenance",
+    "live_read_attempted",
+    "live_read_status",
+    "bus_candidate_seen",
+    "transport",
+    "request_vs_feedback_classified",
+    "promotion_state",
+    "notes"
+  ],
+  "safety_invariants": {
+    "diagnostic_write_allowed": false,
+    "routine_control_allowed": false,
+    "coding_allowed": false,
+    "clear_faults_allowed": false,
+    "can_tx_allowed": false,
+    "flexray_tx_allowed": false,
+    "eps_actuation_allowed": false,
+    "dsc_actuation_allowed": false,
+    "ias_hsr_actuation_allowed": false,
+    "acc_actuation_allowed": false,
+    "unknown_may_become_zero": false,
+    "catalog_presence_proves_realtime_bus_identity": false,
+    "diagnostic_poll_timing_may_prove_request_feedback_order": false
+  },
+  "promotion_requirements": {
+    "STATE_SOURCE_CANDIDATE": [
+      "controller_ownership_known",
+      "units_and_scaling_known",
+      "request_vs_feedback_classified",
+      "freshness_characterized",
+      "repeatable_passive_correlation",
+      "independent_physical_corroboration",
+      "deterministic_replay",
+      "no_actuation_path"
+    ]
+  },
+  "candidates": []
+}
