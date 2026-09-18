@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "artifact": "bmw_flexray_semantic_cross_reference",
+  "reviewed_date": "2026-09-13",
+  "actuation_authority": "NONE",
+  "live_tx_allowed": false,
+  "diagnostic_writes_allowed": false,
+  "cross_series_identity_portable": false,
+  "unknown_becomes_zero": false,
+  "promotion_ladder": [
+    "CROSS_SERIES_REFERENCE",
+    "F13_FRAME_CANDIDATE",
+    "F13_EVENT_CORRELATED",
+    "F13_DIAGNOSTICALLY_CORROBORATED",
+    "F13_CROSS_SOURCE_VALIDATED",
+    "F13_REPLAY_STABLE",
+    "F13_STATE_SOURCE_CANDIDATE"
+  ],
+  "required_capture_provenance": [
+    "channel",
+    "cycle_identity",
+    "slot_or_frame_identity",
+    "payload_length",
+    "payload",
+    "receive_timestamp",
+    "clock_provenance",
+    "adapter_identity",
+    "adapter_firmware",
+    "listen_only_declaration",
+    "drop_overflow_loss_visibility",
+    "capture_session_id"
+  ],
+  "references": [
+    {
+      "platform": "F01/F02",
+      "source": "BMW Technical Training ST401 Body Electronics II",
+      "evidence_state": "CROSS_SERIES_REFERENCE",
+      "observed_controller_families": ["ZGM", "DME", "DSC", "SZL", "HSR", "AL", "SWW", "ICM", "VDM"],
+      "claim": "BMW training material describes FlexRay networking dynamic-driving control systems and engine management in F0x vehicles.",
+      "url": "https://bmwrepairguide.com/virtual-library/technical-training/ST401%20Body%20Electronics%20II.pdf"
+    },
+    {
+      "platform": "F12/F13",
+      "source": "BMW Technical Training ST1109 F12/F13 Complete Vehicle",
+      "evidence_state": "F13_ARCHITECTURE_EVIDENCED",
+      "observed_controller_families": ["EPS", "DSC", "VTG", "DME", "VDM", "HSR", "PMA", "ICM", "ZGM", "SZL", "AL"],
+      "claim": "BMW training material identifies these controller families in the F12/F13 vehicle-electronics architecture.",
+      "url": "https://bmwrepairguide.com/virtual-library/technical-training/ST1109-F12-F13-Complete-Vehicle.pdf"
+    },
+    {
+      "platform": "F30",
+      "source": "BMW Technical Training ST1113 F30 Complete Vehicle",
+      "evidence_state": "CROSS_SERIES_REFERENCE",
+      "observed_controller_families": ["DSC", "DME_DDE", "EPS", "VDM", "SWW", "ICM", "ZGM_FEM"],
+      "claim": "BMW training material describes FlexRay as a system bus for dynamic-handling and engine-control systems in the F30.",
+      "url": "https://bmwrepairguide.com/virtual-library/technical-training/ST1113%20-F30-Complete-Vehicle.pdf"
+    },
+    {
+      "platform": "F30_PHEV",
+      "source": "BMW Technical Training ST401b Bus System Overview",
+      "evidence_state": "CROSS_SERIES_REFERENCE",
+      "observed_controller_families": ["DSC", "VDM", "EPS", "ICM", "DME", "EME", "SME"],
+      "claim": "Public BMW PHEV topology keeps core chassis controllers on FlexRay while hybrid powertrain modules are separately networked, supporting a chassis-contract/powertrain-backend research split.",
+      "url": "https://bmwrepairguide.com/virtual-library/technical-training/ST401b%20Bus%20System%20Overview.pdf"
+    },
+    {
+      "platform": "F01_ACC_STOP_GO",
+      "source": "BMW Technical Training ST055 Engine Electronics",
+      "evidence_state": "CROSS_SERIES_REFERENCE",
+      "observed_controller_families": ["ZGM", "DSC", "LRR", "DME", "ICM"],
+      "claim": "BMW training material shows an ACC Stop & Go interface involving ICM, DSC, DME, radar and FlexRay.",
+      "url": "https://bmwrepairguide.com/virtual-library/technical-training/ST055%20Engine%20Electronics.pdf"
+    }
+  ],
+  "semantic_families": {
+    "chassis_core": [
+      "vehicle_speed",
+      "wheel_speed_fl",
+      "wheel_speed_fr",
+      "wheel_speed_rl",
+      "wheel_speed_rr",
+      "yaw_rate",
+      "lateral_acceleration",
+      "longitudinal_acceleration",
+      "steering_wheel_angle",
+      "front_rack_or_road_wheel_angle_actual",
+      "driver_steering_torque_actual",
+      "steering_actuator_torque_actual",
+      "icm_chassis_motion_state",
+      "dsc_intervention_state",
+      "eps_availability_fault_state",
+      "hsr_ias_rear_steer_actual",
+      "pma_manoeuvre_or_trajectory_request_candidate"
+    ],
+    "powertrain_chassis_boundary": [
+      "propulsion_ready",
+      "drive_torque_actual",
+      "drive_torque_available",
+      "drive_torque_limit",
+      "torque_reduction_state",
+      "direction_or_gear_state",
+      "drivetrain_availability_fault",
+      "traction_limited_state",
+      "brake_regen_interaction_state",
+      "vtg_xdrive_state"
+    ],
+    "hybrid_bev_donor_vocabulary": [
+      "eme_state",
+      "electric_drive_ready",
+      "motor_torque_actual",
+      "motor_torque_available",
+      "recuperation_regen_limit",
+      "hv_ready_fault_state",
+      "icm_dsc_electric_drive_interaction"
+    ]
+  }
+}
