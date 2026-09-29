@@ -27,6 +27,39 @@ Sport / special days -> N63 + electric assist
 
 The engineering challenge is to achieve that without sacrificing OEM drivability, xDrive integration, chassis behavior or serviceability.
 
+## Join the project
+
+This project is deliberately being developed in public because no single person needs to solve the whole conversion.
+
+If you know one small part well, that is already useful.
+
+We are looking for people who can contribute things such as:
+
+- one accurate transmission dimension;
+- one teardown photo with a readable ZF/BMW tag;
+- one verified CAN signal;
+- one K0 or oil-pump control detail;
+- one CAD interface;
+- one battery-cell data point;
+- one thermal/FEA review;
+- one BMS or HV-safety recommendation.
+
+You do **not** need to commit to the whole build.
+
+### Current help-wanted tasks
+
+- [#55 – N63 8HP75 front interface vs GA8P75HZ hybrid case](https://github.com/freddykat/f13-autonomy/issues/55)
+- [#56 – 8P75XPH AWD output vs F13 ATC35L](https://github.com/freddykat/f13-autonomy/issues/56)
+- [#57 – F04 MSD85_HY hybrid torque / regen / start-stop CAN](https://github.com/freddykat/f13-autonomy/issues/57)
+- [#58 – GA8P75HZ K0 and auxiliary oil-pump control](https://github.com/freddykat/f13-autonomy/issues/58)
+- [#59 – F13 rear-shell 40–45 kWh battery scan / CAD](https://github.com/freddykat/f13-autonomy/issues/59)
+
+### What contributors get back
+
+Everything we can legally share from our own measurements, CAD interfaces, test results, CAN observations and validation work will be documented here so the result is useful beyond one car.
+
+We especially want this project to become a useful reference for people trying to keep older high-end BMWs technically relevant without throwing away the character that made them desirable in the first place.
+
 ## Target
 
 - Keep the N63B44A V8.
