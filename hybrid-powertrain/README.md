@@ -2,6 +2,31 @@
 
 Experimental engineering subproject for converting a BMW F13 650i xDrive with N63B44A into a plug-in hybrid while preserving the OEM BMW character and as much F-series integration as possible.
 
+## Why this project exists
+
+We are **petrolheads first**. We like the N63, the sound and character of a V8, and the idea of keeping a BMW 650i feeling like a real 650i. This project is not an attempt to remove the combustion engine from the car or turn it into a generic EV.
+
+The objective is to get the **best of both worlds**:
+
+- **Daily commute:** run electrically whenever practical, with low energy cost, quiet operation and regenerative braking.
+- **Long trips:** retain the range, refuelling speed and flexibility of the N63.
+- **Performance driving:** keep the V8 available and combine ICE + electric torque when desired.
+- **Efficiency:** use the electric system to reduce unnecessary fuel use in traffic, short trips and low-load driving rather than carrying a large V8 through those conditions all the time.
+
+A concrete benchmark for the project is that the normal daily commute should become **cheaper to run on energy than a small Citroën DS3 1.2 VTi**, while the same car can still deliver the performance, sound and character expected from a V8 650i when requested.
+
+So the goal is not maximum horsepower at all times. The goal is a genuinely dual-personality car:
+
+```text
+weekday commute -> EV
+traffic / city -> EV
+normal mixed use -> automatic hybrid
+long-distance cruise -> efficient hybrid / ICE as appropriate
+Sport / special days -> N63 + electric assist
+```
+
+The engineering challenge is to achieve that without sacrificing OEM drivability, xDrive integration, chassis behavior or serviceability.
+
 ## Target
 
 - Keep the N63B44A V8.
